@@ -63,10 +63,12 @@ inv_adjust(in_file)
 		
 		proc Readrec1
 			fgets	0	TheRecord
-			strextract sku therecord "," 0
-			strextract on_hand therecord "," 1
-			strextract whs_num therecord "," 2
+			strextract whs_num therecord "," 0
+			strextract sku therecord "," 1
+			strextract on_hand therecord "," 2
 		endproc
 	)
-	fileappend, %aspect_string%,C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was
+	aspect_file:= "C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was"
+	fileappend, %aspect_string%,%aspect_file%
+	return %aspect_file%
 }

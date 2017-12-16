@@ -19,15 +19,29 @@ buttonReload:
 	
 buttonGo!:
 {
-	loc_array:=[15,14,11,10,09,08,07,06,04,60,98,97]
-	for index, value in loc_array
+	msgbox  ,6, End of Year Script, Please close all instances of excel before continuing
+	ifmsgbox continue
 	{
-		print_neg_stk_rpt(value, doc_name)
-		file_cleaner(value,doc_name,neg_stk_csv)
-		inv_adjust(neg_stk_csv)
+		process, close, excel.exe
+		rpt:=A_mydocuments "\Cyberquery\jes_neg_stk_all_whs.xlsx"
+		book:=A_mydocuments "\Cyberquery\neg_stk_rpt"A_Now
+		run, *Runas "P:\Forms\Cyber Query Reports\IT\neg_stk_rpt_all_whs.lnk",hide
+		process, wait, excel.exe
+		sleep 2000
+		xlwb:=comobjactive("Excel.Application").activeworkbook
+		xlwb.saveas(book,6)
+		process, close, excel.exe
+		process, close, cqwr.exe
+		process, close, cqwview.exe
 	}
+	else ifmsgbox cancel
+	{
+		exitapp
+	}
+	else
+	{
+		reload
+	}
+	inv_adjust(book)
 }
-
-#include End_of_year.ahk //prints neg stk rpt
-#include eoy_cleaner.ahk //cleans neg stk rpt
-#include eoy_inv_adj.ahk //post inv adjustments
+#include eoy_inv_adj.ahk

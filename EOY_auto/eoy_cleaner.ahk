@@ -6,7 +6,7 @@ file_cleaner(whs,doc_name,byref neg_stk_csv)
 {
 Fileread, Text,g:\doc_name				//fix file name
 Text:=RegExReplace(Text,"`f")
-neg_stk_csv:="neg_stk_" whs ".csv"
+neg_stk_csv:=%a_Temp% "\neg_stk_" whs ".csv"
 	loop,Parse, Text,`n,`r
 	{
 		if instr(A_Loopfield,"Run date:")
@@ -58,7 +58,7 @@ neg_stk_csv:="neg_stk_" whs ".csv"
 		}
 		on_hand:=strReplace(on_hand,"-")	
 		line:=sku "," on_hand "," whs "`r`n"
-		Fileappend, %line%, %a_Temp%\%neg_stk_csv%
+		Fileappend, %line%, %neg_stk_csv%
 		sku:=mfg_sku:=descpt:=on_hand:=dept:=class:=fine:=on_order=
 	}
 }

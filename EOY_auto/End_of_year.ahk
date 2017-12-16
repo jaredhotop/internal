@@ -4,8 +4,11 @@
 SetWorkingDir %A_ScriptDir%
 
 
-print_neg_stk_rpt(whs, byref doc_name)
+print_neg_stk_rpt(whs,byref Aspect_out, byref doc_name)
 {
+
+Aspect_out:="End_of_year.was"
+
 user:= "schedule"
 pass:= "shrugs"	
 doc_name=neg_stk_rpt_%whs%.txt
@@ -48,7 +51,8 @@ doc_name=neg_stk_rpt_%whs%.txt
 		transmit "%whs%"
 		pause 2
 		transmit "^M"
+		exit 1
 		endproc
 	)
-	FileAppend, %aspect_string%,C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year.was
+	FileAppend, %aspect_string%,C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\%Aspect_out%
 }

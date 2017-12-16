@@ -42,10 +42,10 @@ inv_adjust(in_file)
 			pause 1
 			transmit "^M"
 			transmit "^M"
-			transmit "lms"									//Maybe replace with value to indicate scheduler activity
+			transmit "^M"							
 			transmit "^M"
 			pause 1
-			transmit "some comment value here"				//adjust this line
+			transmit "scheduled fix neg stock"			
 			transmit "^M"
 			pause 1
 			transmit whs_num
@@ -69,5 +69,4 @@ inv_adjust(in_file)
 		endproc
 	)
 	fileappend, %aspect_string%,C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was
-	msgbox %aspect_string%
 }

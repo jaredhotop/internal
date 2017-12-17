@@ -42,6 +42,7 @@ buttonGo!:
 	{
 		reload
 	}
-	inv_adjust(book)
+	aspect_file:=inv_adjust(book)
+	//run *runas "C:\Program Files (x86)\Symantec\Procomm Plus\PROGRAMS\PW5.exe" CONNECT "Falcon" %aspect_file%
 }
 #include eoy_inv_adj.ahk

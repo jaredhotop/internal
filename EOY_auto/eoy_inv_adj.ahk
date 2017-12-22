@@ -8,7 +8,7 @@ inv_adjust(in_file)
 	FileDelete,  C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was
 	aspect_string=
 	(
-		string sku,on_hand,whs_num, therecord
+		string sku,on_hand,whs_num,stocked,cost, therecord
 		proc main 
 		string Data2="%in_file%"
 		integer TheEnd
@@ -57,6 +57,14 @@ inv_adjust(in_file)
 			transmit on_hand
 			pause 3
 			transmit "^AA^M"
+		/*test this
+			if stocked = 0
+				transmit "^M"
+			endif
+			if cost = 0.00
+				transmit "^M"
+			endif
+		*/
 			readrec1()
 		  endwhile
 		endproc
@@ -66,6 +74,8 @@ inv_adjust(in_file)
 			strextract whs_num therecord "," 0
 			strextract sku therecord "," 1
 			strextract on_hand therecord "," 2
+			strextract stocked therecord "," 3
+			strextract cost therecord "," 4
 		endproc
 	)
 	aspect_file:= "C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was"

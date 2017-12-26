@@ -7,12 +7,12 @@ SetWorkingDir %A_ScriptDir%
 rec_xfers(in_file)
 {
 
-Aspect_out:="recieve_trans.was"
+Aspect_out:="C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\recieve_trans.was"
 
 user:= "schedule"
 pass:= "shrugs"	
 doc_name=neg_stk_rpt_%whs%.txt
-	FileDelete,  C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\%aspect_out%
+	FileDelete,  %aspect_out%
 	aspect_string=
 	(
 		string po_num,therecord
@@ -60,6 +60,6 @@ doc_name=neg_stk_rpt_%whs%.txt
 			strextract po_num therecord "," 0
 		endproc
 	)
-	FileAppend, %aspect_string%,C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\%Aspect_out%
+	FileAppend, %aspect_string%,%Aspect_out%
 	return aspect_out
 }

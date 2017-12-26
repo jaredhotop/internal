@@ -4,8 +4,9 @@
 inv_adjust(in_file)
 {
 	user:= "schedule"
-	pass:= "shrugs"																														
-	FileDelete,  C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was
+	pass:= "shrugs"				
+	aspect_file:= "C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was"	
+	FileDelete,  %aspect_file%
 	aspect_string=
 	(
 		string sku,on_hand,whs_num,stocked,cost, therecord
@@ -57,14 +58,12 @@ inv_adjust(in_file)
 			transmit on_hand
 			pause 3
 			transmit "^AA^M"
-		/*test this
 			if stocked = 0
 				transmit "^M"
 			endif
 			if cost = 0.00
 				transmit "^M"
 			endif
-		*/
 			readrec1()
 		  endwhile
 		endproc
@@ -78,7 +77,6 @@ inv_adjust(in_file)
 			strextract cost therecord "," 4
 		endproc
 	)
-	aspect_file:= "C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\End_of_year_negstk_adjust.was"
 	fileappend, %aspect_string%,%aspect_file%
 	return %aspect_file%
 }

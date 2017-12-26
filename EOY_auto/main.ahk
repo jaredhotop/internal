@@ -19,6 +19,8 @@ buttonReload:
 	
 buttonGo!:
 {
+	gui, submit, hide
+	
 	msgbox  ,6, End of Year Script, Please close all instances of excel and Cyberquery before continuing
 	ifmsgbox continue
 	{
@@ -32,7 +34,7 @@ buttonGo!:
 	//run neg stk rpt and convert to csv
 		run, *Runas "P:\Forms\Cyber Query Reports\IT\neg_stk_rpt_all_whs.lnk",hide
 		process, wait, excel.exe
-		sleep 2000
+		sleep 4000
 		xlwb:=comobjactive("Excel.Application").activeworkbook
 		xlwb.saveas(book,6)
 		process, close, excel.exe
@@ -46,7 +48,7 @@ buttonGo!:
 	//run open transfers and convert to csv
 		run, *Runas "P:\Forms\Cyber Query Reports\IT\open_po_xfer.lnk",hide
 		process, wait, excel.exe
-		sleep 2000
+		sleep 4000
 		xlwb:=comobjactive("Excel.Application").activeworkbook
 		xlwb.saveas(book,6)
 		process, close, excel.exe
@@ -65,7 +67,7 @@ buttonGo!:
 		reload
 	}
 	msgbox End of year Script has finished. Please allow Procomm scripts to run until completion
-	
+	Exitapp
 	
 	
 }

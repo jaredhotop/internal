@@ -74,6 +74,9 @@ class Entry:
 		
 	def set_out_of_stock(self):
 		self.comp_shop_out_of_stock = True
+		
+	def get_url(self):
+		return str(self.url)
 
 		
 		

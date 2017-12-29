@@ -43,7 +43,7 @@ buttonGo!:
 		process, close, cqwview.exe
 	//run inventory adjustments
 		aspect_file:=inv_adjust(book ".csv")
-		//run *runas "C:\Program Files (x86)\Symantec\Procomm Plus\PROGRAMS\PW5.exe" CONNECT "Falcon" %aspect_file%
+		run *runas "C:\Program Files (x86)\Symantec\Procomm Plus\PROGRAMS\PW5.exe" CONNECT "Falcon" %aspect_file%
 		
 		book:=A_mydocuments "\Cyberquery\open_xfers"A_Now
 	//run open transfers and convert to csv
@@ -58,7 +58,7 @@ buttonGo!:
 		process, close, cqwview.exe
 	//Recieve transfers
 		aspect_file:=rec_xfers(book ".csv")
-		//run *runas "C:\Program Files (x86)\Symantec\Procomm Plus\PROGRAMS\PW5.exe" CONNECT "Falcon" %aspect_file%
+		run *runas "C:\Program Files (x86)\Symantec\Procomm Plus\PROGRAMS\PW5.exe" CONNECT "Falcon" %aspect_file%
 	}
 	else ifmsgbox cancel
 	{

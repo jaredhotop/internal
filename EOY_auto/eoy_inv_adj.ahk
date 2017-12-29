@@ -1,6 +1,9 @@
 #singleinstance, force
 #commentflag, //
 
+
+
+
 inv_adjust(in_file)
 {
 	user:= "schedule"
@@ -36,37 +39,35 @@ inv_adjust(in_file)
 		pause 1
 		transmit "i"
 		pause 1
-		
-		while not feof 0
-			transmit "NEG"
+		transmit "NEG"
+		transmit "^M"
+		pause 1
+		transmit "^M"
+		transmit "^M"
+		transmit "^M"							
+		transmit "^M"
+		pause 1
+		transmit "scheduled fix neg stock"			
+		transmit "^M"
+	while not feof 0
+		pause 1
+		transmit whs_num
+		transmit "^M"
+		pause 1
+		transmit sku
+		transmit "^M"
+		pause 1
+		transmit on_hand
+		pause 3
+		transmit "^AA^M"
+		if strcmp stocked "0"
 			transmit "^M"
-			pause 1
-			transmit "^M"
-			transmit "^M"
-			transmit "^M"							
-			transmit "^M"
-			pause 1
-			transmit "scheduled fix neg stock"			
-			transmit "^M"
-			pause 1
-			transmit whs_num
-			transmit "^M"
-			pause 1
-			transmit sku
-			transmit "^M"
-			pause 1
-			transmit on_hand
 			pause 3
-			transmit "^AA^M"
-			if stocked = 0
-				transmit "^M"
-			endif
-			if cost = 0.00
-				transmit "^M"
-			endif
-			readrec1()
-		  endwhile
-		endproc
+		endif
+		transmit "^AC^M"
+		readrec1()
+	  endwhile
+	endproc
 		
 		proc Readrec1
 			fgets	0	TheRecord

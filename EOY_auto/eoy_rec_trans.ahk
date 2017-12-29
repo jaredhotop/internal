@@ -11,7 +11,6 @@ Aspect_out:="C:\Program Files (x86)\Symantec\Procomm Plus\Aspect\recieve_trans.w
 
 user:= "schedule"
 pass:= "shrugs"	
-doc_name=neg_stk_rpt_%whs%.txt
 	FileDelete,  %aspect_out%
 	aspect_string=
 	(
@@ -39,19 +38,28 @@ doc_name=neg_stk_rpt_%whs%.txt
 				pause 1
 				transmit "p"
 				pause 2
-			while not FEOF 0
+			
 				transmit "^M"
 				pause 2
 				transmit "^M"
 				pause 1
+			while not FEOF 0
 				transmit po_num
 				transmit "^M"
-				pause 60
+				pause 2
 				transmit "^AH^M"
 				pause 2
 				transmit "y"
-				pause 1
+				pause 2
+				transmit "n"
+				pause 2
 				transmit "^AD^M"
+				pause 1
+				transmit "y"
+				pause 2
+				transmit "^AC^M"
+				transmit "^AC^M"
+				pause 1
 				readrec1()
 			endwhile
 		endproc

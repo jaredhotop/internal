@@ -37,6 +37,7 @@ buttonGo!:
 		sleep 4000
 		xlwb:=comobjactive("Excel.Application").activeworkbook
 		xlwb.saveas(book,6)
+		xlwb.saveas(book "_job_list",6)
 		process, close, excel.exe
 		process, close, cqwr.exe
 		process, close, cqwview.exe
@@ -51,6 +52,7 @@ buttonGo!:
 		sleep 4000
 		xlwb:=comobjactive("Excel.Application").activeworkbook
 		xlwb.saveas(book,6)
+		xlwb.saveas(book "_job_list",6)
 		process, close, excel.exe
 		process, close, cqwr.exe
 		process, close, cqwview.exe

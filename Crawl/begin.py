@@ -1,7 +1,10 @@
 import csv
 import os
 import socket
+import scrape_class
 import entry_class
+from bs4 import BeautifulSoup
+import urllib.request
 
 def get_ip():
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -33,4 +36,9 @@ with open(file_name,"r" )as f:
 		
 		
 for obj in search_arr:
-	obj.write_entry("test_out.csv")
+	search = scrape_class.Scraper(obj.get_url())
+	search.scrape()
+	with open("test.txt", "w") as f:
+		f.write(search.get_soup())
+	break
+#	obj.write_entry("test_out.csv")

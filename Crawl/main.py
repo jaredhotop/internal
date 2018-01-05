@@ -17,7 +17,7 @@ def get_ip():
  
  
 ip = get_ip().split(".")
-file_name = "test.csv"
+file_name = os.path.normpath("C:\Users\admin\Documents\CurrentCodeRepo\internal\Crawl\test.csv")
 #file_name = "price_shop_list_" + ip[3]+".csv"
 #file_name = os.path.join("P:","IT","Data Warehouse","Price Change Reports", "Buyer Runs",file_name)
 search_arr = []

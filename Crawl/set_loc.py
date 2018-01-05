@@ -8,27 +8,41 @@ import os
 import time
 import shutil
 
+
+
 def create_driver():
     chrome_options = Options()
 #   chrome_options.add_argument("--headless")
 #   chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
+    chrome_options.add_argument("user-data-dir=/home/test/.config/google-chrome")
 #   chrome_driver = "/home\\lubuntu\\bin\\chromedriver.exe"
-    driver_path = os.path.expanduser('~/bin') + '/chromedriver'
+    driver_path = os.path.expanduser('~/bin/chromedriver')
     driver = webdriver.Chrome(driver_path,chrome_options = chrome_options)
     return driver
 
 
 
 def set_cookies():
+#    _version()
     _belleville()
-
+    _cape()
+    _farmington()
+    _festus()
+    _high_ridge()
+    _jacksonville()
+    _springfield()
 
 
 
 
 #set location cookies functions
 
+def _version():
+    driver = create_driver()
+    driver.get("chrome://version")
+    time.sleep(30)
+    driver.quit()
+    return
 
 def _belleville():
     try:
@@ -88,7 +102,7 @@ def _farmington():
         counter += 1
         try:
             _tsc(driver,"63640")
-            _lowes(driver,"63640")
+#            _lowes(driver,"63640")
             _menards(driver,"3334")
         except:
             if counter == 5:
@@ -200,6 +214,7 @@ def _home_depot(driver,zip):
     driver.find_element_by_id("storeSearchBox").send_keys(zip,Keys.ENTER)
     WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "a.bttn-outline[data-storeid]")))
     driver.find_element_by_css_selector("a.bttn-outline[data-storeid]").click()
+    time.sleep(1)
     return driver
 
 def _tsc(driver,zip):
@@ -237,4 +252,4 @@ def _menards(driver,store_id):
 
 #test_code
 
-set_cookies()
+#set_cookies()

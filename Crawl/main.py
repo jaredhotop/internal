@@ -1,4 +1,5 @@
-import crawl_class
+#import crawl_class
+import set_loc
 import entry_class
 import socket
 import os
@@ -14,25 +15,19 @@ def get_ip():
 		finally:
 			s.close()
 		return IP
- 
- 
+
+
 ip = get_ip().split(".")
-file_name = os.path.normpath("C:\Users\admin\Documents\CurrentCodeRepo\internal\Crawl\test.csv")
-#file_name = "price_shop_list_" + ip[3]+".csv"
-#file_name = os.path.join("P:","IT","Data Warehouse","Price Change Reports", "Buyer Runs",file_name)
+file_name = os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/testrun"+ip[3]+".csv")
 search_arr = []
 with open(file_name,"r" )as f:
 	r = csv.reader(f,delimiter = ",")
 	for row in r:
 		temp = entry_class.Entry(row[0],row[1],row[2],row[3],row[4],row[5],row[6])
 		search_arr.append(temp)
-		
+#set_cookies()
 for obj in search_arr:
-	search = crawl_class.Crawl(obj.get_url())
-	print(search._get_page_data())
-	with open("test.txt", "w") as f:
-		f.write(search._get_page_data())
-	break		
-		
-
-
+	obj.crawl()
+	break
+	obj.write_entry(os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/test_out"+ip[3]+".csv"))
+print("done")

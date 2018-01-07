@@ -1,6 +1,7 @@
 #import crawl_class
 import set_loc
 import entry_class
+import aux_func
 import os
 import csv
 

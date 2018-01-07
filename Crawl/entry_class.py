@@ -8,7 +8,7 @@ import os
 
 
 class Entry:
-	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
+	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url,ip):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
 		now = datetime.now()
 		self.unique_id = now.strftime("%Y%m%d")+comp_id+sku
@@ -34,12 +34,15 @@ class Entry:
 		self.comp_shop_out_of_stock = False
 		self.comp_shop_third_party = False
 		self.url = url
-		self.error = None
+		self.log_msg = None
+		self.machine_ip = ip
 
 	def write_entry(self, file):
+		self._log("Writing entry to file: " + file)
 		with open(file, "a") as f:
 			out = csv.writer(f, delimiter = ",")
 			out.writerow(self._data_tup())
+		return
 
 	def _print_readable(self):
 		variables = ("unique_id", "comp_id", "comp_match", "comp_price", \
@@ -51,6 +54,7 @@ class Entry:
 		values = self._data_tup()
 		for i in range(len(variables)):
 			print(variables[i],":",values[i])
+		return
 
 	def _data_tup(self):
 		return (self.unique_id, self.comp_id, self.comp_match, self.comp_price,  \
@@ -62,19 +66,28 @@ class Entry:
 
 	def set_price(self,price):
 		self.comp_price = price
+		self._log("Set competitor price to: " + price)
+		return
 
 	def set_sale_price(self,price):
 		self.comp_sale_price = price
+		self._log("Set competitor sale price to: " + price)
+		return
 
 	def set_shop_date(self):
 		self.shop_date = now.strftime("%Y-%m-%d %H:%M:%S")
+		return
 
 	def set_third_party(self):
 		self.comp_shop_third_party = True
 		self.comp_match_id = 2
+		self._log("Set link as third party")
+		return
 
 	def set_out_of_stock(self):
 		self.comp_shop_out_of_stock = True
+		self._log("Set item as \"out of stock\"")
+		return
 
 	def get_url(self):
 		return str(self.url)
@@ -85,77 +98,23 @@ class Entry:
 		chrome_options.add_argument("--disable-gpu")
 		chrome_options.add_argument("user-data-dir=/home/test/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
+		self._log("Driver created")
 		return self.driver_path
 
 	def _kill_driver(self):
 		self.driver.quit()
-
-
-#Competitor specific methods
-
-	def _academy(self):
+		self._log("Driver destroyed")
 		return
 
-	def _acehardware(self):
-		return
-
-	def _basspro(self):
-		return
-
-	def _blain(self):
-		return
-
-	def _bootbarn(self):
-		return
-
-	def _cabela(self):
-		print('cabelas')
-		return
-
-	def _dickeybub(self):
-		return
-
-	def _home_depot(self):
-		return
-
-	def _farm_and_home(self):
-		return
-
-	def _lowes(self):
-		return
-
-	def _menards(self):
-		return
-
-	def _orscheln(self):
-		return
-
-	def _ruralking(self):
-		return
-
-	def _sears(self):
-		return
-
-	def _shelper(self):
-		return
-
-	def _tsc(self):
-		return
-
-	def _valleyvet(self):
-		return
-
-	def _walmart(self):
-		print('hello world')
-		return
-
-
-
-	def _default(self):
-		self.error = "Invalid Competitor ID"
+	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+ip[3]+"self._log.log")):
+		self.log_msg = log_msg
+		with open(file,"a") as f:
+			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ",sku: " + self.skum + ", Log Message: " + self.log_msg)
+		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ",sku: " + self.skum + ", Log Message: " + self.log_msg)
 		return
 
 	def crawl(self):
+		self._log("Crawl intialized")
 		switch = {
 			1 : self._academy,
 			2 : self._basspro,
@@ -187,4 +146,84 @@ class Entry:
 			74: self._tsc
 		}
 		switch.get(self.comp_id,self._default)()
+		return
+
+#Competitor specific methods
+
+	def _academy(self):
+		self._create_driver()
+		self._log("Competitor not yet defined")
+		self._kill_driver()
+		return
+
+	def _acehardware(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _basspro(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _blain(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _bootbarn(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _cabela(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _dickeybub(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _home_depot(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _farm_and_home(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _lowes(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _menards(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _orscheln(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _ruralking(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _sears(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _shelper(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _tsc(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _valleyvet(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _walmart(self):
+		self._log("Competitor not yet defined")
+		return
+
+	def _default(self):
+		self._log("Unknown Competitor ID")
 		return

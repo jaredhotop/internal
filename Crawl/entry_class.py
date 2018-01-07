@@ -38,10 +38,13 @@ class Entry:
 		self.machine_ip = ip
 
 	def write_entry(self, file):
-		self._log("Writing entry to file: " + file)
-		with open(file, "a") as f:
-			out = csv.writer(f, delimiter = ",")
-			out.writerow(self._data_tup())
+		if (self.comp_price != None and self.comp_sale_price != None):
+			self._log("Writing entry to file: " + file)
+			with open(file, "a") as f:
+				out = csv.writer(f, delimiter = ",")
+				out.writerow(self._data_tup())
+		else:
+			self._log("Entry not written. comp_price or comp_sale_price is unset.")
 		return
 
 	def _print_readable(self):
@@ -65,13 +68,19 @@ class Entry:
 		self.comp_match_id,self.comp_shop_out_of_stock, self.comp_shop_third_party)
 
 	def set_price(self,price):
-		self.comp_price = price
-		self._log("Set competitor price to: " + price)
+		if isinstance(price, (int, long, float)):
+			self.comp_price = price
+			self._log("Set competitor price to: " + price)
+		else:
+			self._log("Attempted to set competitor price as: " + price + " but it is not a number")
 		return
 
 	def set_sale_price(self,price):
-		self.comp_sale_price = price
-		self._log("Set competitor sale price to: " + price)
+		if isinstance(price, (int, long, float)):
+			self.comp_sale_price = price
+			self._log("Set competitor sale price to: " + price)
+		else:
+			self._log("Attempted to set competitor sale price to: " + price + " but it is not a number")
 		return
 
 	def set_shop_date(self):

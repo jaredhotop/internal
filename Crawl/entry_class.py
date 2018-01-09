@@ -1,6 +1,7 @@
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import aux_func
 import csv
 from io import StringIO
 import sys
@@ -98,7 +99,7 @@ class Entry:
 		self._log("Set item as \"out of stock\"")
 		return
 
-	def get_url(self):
+	def _get_url(self):
 		return str(self.url)
 
 	def _create_driver(self):
@@ -161,77 +162,95 @@ class Entry:
 
 	def _academy(self):
 		self._create_driver()
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		self._kill_driver()
 		return
 
 	def _acehardware(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _basspro(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _blain(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _bootbarn(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _cabela(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _dickeybub(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _home_depot(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _farm_and_home(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _lowes(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _menards(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _orscheln(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _ruralking(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _sears(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _shelper(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _tsc(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _valleyvet(self):
-		self._log("Competitor not yet defined")
+		self._log("Competitor: " + self.comp_id + " not yet defined")
 		return
 
 	def _walmart(self):
-		self._log("Competitor not yet defined")
-		return
+		driver = self._create_driver()
+		try:
+			driver.get(self._get_url())
+		except:
+			self._log("Failed to retrieve url")
+		else:
+			self.set_shop_date()
+			try:
+				self.set_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue").find_element_by_css_selector("span.Price-group").get_attribute("title")))
+			except:
+				self._log("Failed to retrieve competitor price using any known css selector")
+			else:
+				try:
+					self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+				except:
+					self._log("No sale price found using current css selectors")
+					self.set_sale_price("0.00")
+		finally:
+			self._kill_driver()
+			return
 
 	def _default(self):
 		self._log("Unknown Competitor ID")

@@ -1,6 +1,7 @@
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
 import aux_func
 import csv
 from io import StringIO
@@ -167,67 +168,99 @@ class Entry:
 		return
 
 	def _acehardware(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _basspro(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _blain(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _bootbarn(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _cabela(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _dickeybub(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _home_depot(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _farm_and_home(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _lowes(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _menards(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _orscheln(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _ruralking(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _sears(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _shelper(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _tsc(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _valleyvet(self):
+		self._create_driver()
 		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._kill_driver()
 		return
 
 	def _walmart(self):
@@ -248,6 +281,10 @@ class Entry:
 				except:
 					self._log("No sale price found using current css selectors")
 					self.set_sale_price("0.00")
+				try:
+					check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
+					if check != True:
+						self.set_third_party()
 		finally:
 			self._kill_driver()
 			return

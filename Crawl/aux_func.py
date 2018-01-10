@@ -11,3 +11,8 @@ def get_ip():
 		finally:
 			s.close()
 		return IP
+
+def clean(string):
+	string = string.trim()
+	string = string.replace("$","")
+	return string

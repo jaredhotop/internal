@@ -4,8 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 import aux_func
 import csv
-from io import StringIO
-import sys
+#from io import StringIO   #what is this line for?
+#import sys   #what is this line for?
 import os
 
 
@@ -38,6 +38,7 @@ class Entry:
 		self.url = url
 		self.log_msg = None
 		self.machine_ip = ip
+		self.pagedata = None
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None):
@@ -74,7 +75,7 @@ class Entry:
 			self.comp_price = price
 			self._log("Set competitor price to: " + price)
 		else:
-			self._log("Attempted to set competitor price as: " + price + " but it is not a number")
+			self._log("Attempted to set competitor price as: {price} but it is not a number")
 		return
 
 	def set_sale_price(self,price):
@@ -82,7 +83,7 @@ class Entry:
 			self.comp_sale_price = price
 			self._log("Set competitor sale price to: " + price)
 		else:
-			self._log("Attempted to set competitor sale price to: " + price + " but it is not a number")
+			self._log("Attempted to set competitor sale price to: {price} but it is not a number")
 		return
 
 	def set_shop_date(self):
@@ -100,8 +101,16 @@ class Entry:
 		self._log("Set item as \"out of stock\"")
 		return
 
+	def set_unique_id:
+		self.unique_id = self.unique_id + '1'
+		self._log("Corrected unique_id duplicate")
+		return
+
 	def _get_url(self):
 		return str(self.url)
+
+	def get_unique_id(self):
+		return self.unique_id
 
 	def _create_driver(self):
 		chrome_options = Options()
@@ -118,10 +127,10 @@ class Entry:
 		return
 
 	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+ip[3]+"self._log.log")):
-		self.log_msg = log_msg
+		self.log_msg = self.Log_msg + " \n" + log_msg
 		with open(file,"a") as f:
-			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ",sku: " + self.skum + ", Log Message: " + self.log_msg)
-		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ",sku: " + self.skum + ", Log Message: " + self.log_msg)
+			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.skum + " , Log Message: " + self.log_msg)
+		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.skum + " , Log Message: " + self.log_msg)
 		return
 
 	def crawl(self):
@@ -163,103 +172,103 @@ class Entry:
 
 	def _academy(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _acehardware(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _basspro(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _blain(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _bootbarn(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _cabela(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _dickeybub(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _home_depot(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _farm_and_home(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _lowes(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _menards(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _orscheln(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _ruralking(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _sears(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _shelper(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _tsc(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
 	def _valleyvet(self):
 		self._create_driver()
-		self._log("Competitor: " + self.comp_id + " not yet defined")
+		self._log("Competitor: {self.comp_id} not yet defined")
 		self._kill_driver()
 		return
 
@@ -285,6 +294,14 @@ class Entry:
 					check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
 					if check != True:
 						self.set_third_party()
+				except:
+					pass
+				try:
+					#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
+					if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
+						self.set_out_of_stock()
+				except:
+					pass
 		finally:
 			self._kill_driver()
 			return

@@ -189,9 +189,43 @@ class Entry:
 		return
 
 	def _blain(self):
-		self._create_driver()
-		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
+		try:
+			driver = self._create_driver()
+		except:
+			self._log("Driver failed to start")
+		else:
+			try:
+				driver.get(self._get_url())
+				self.pagedata = driver.page_source.encode('utf-8')
+			except:
+				self._log("Failed to retrieve url")
+			else:
+				self.set_shop_date()
+				try:
+					selectors = ["div.active-price>div.price>span","div.original-price>span.price>span"]
+					for selector in selectors:
+						price = clean(driver.find_element_by_css_selector().get_attribute("innerHTML"))
+						if price:
+							self.set_price(price)
+							break
+						else:
+							continue
+				except:
+					self._log("Failed to retrieve competitor price using any known css selector")
+				else:
+					try:
+						#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML"))
+					except:
+						self._log("No sale price found using current css selectors")
+						self.set_sale_price("0.00")
+					try:
+						if not (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.stock-msg.in-stock")):
+							self.set_out_of_stock()
+					except:
+						pass
+			finally:
+				self._kill_driver()
 		return
 
 	def _bootbarn(self):
@@ -243,9 +277,42 @@ class Entry:
 		return
 
 	def _ruralking(self):
-		self._create_driver()
-		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
+		# try:
+		# 	driver = self._create_driver()
+		# except:
+		# 	self._log("Driver failed to start")
+		# else:
+		# 	try:
+		# 		driver.get(self._get_url())
+		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# 	except:
+		# 		self._log("Failed to retrieve url")
+		# 	else:
+		# 		self.set_shop_date()
+		# 		try:
+		# 			self.set_price(clean(driver.find_element_by_css_selector("div.price-box > span.regular-price > span.price").get_attribute("text")))
+		# 		except:
+		# 			self._log("Failed to retrieve competitor price using any known css selector")
+		# 		else:
+		# 			try:
+		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+		# 			except:
+		# 				self._log("No sale price found using current css selectors")
+		# 				self.set_sale_price("0.00")
+		# 			try:
+		# 				check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
+		# 				if check != True:
+		# 					self.set_third_party()
+		# 			except:
+		# 				pass
+		# 			try:
+		# 				#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
+		# 				if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
+		# 					self.set_out_of_stock()
+		# 			except:
+		# 				pass
+		# 	finally:
+		# 		self._kill_driver()
 		return
 
 	def _sears(self):
@@ -273,38 +340,43 @@ class Entry:
 		return
 
 	def _walmart(self):
-		driver = self._create_driver()
 		try:
-			driver.get(self._get_url())
+			driver = self._create_driver()
 		except:
-			self._log("Failed to retrieve url")
+			self._log("Driver failed to start")
 		else:
-			self.set_shop_date()
 			try:
-				self.set_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue").find_element_by_css_selector("span.Price-group").get_attribute("title")))
+				driver.get(self._get_url())
+				self.pagedata = driver.page_source.encode('utf-8')
 			except:
-				self._log("Failed to retrieve competitor price using any known css selector")
+				self._log("Failed to retrieve url")
 			else:
+				self.set_shop_date()
 				try:
-					self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+					self.set_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue").find_element_by_css_selector("span.Price-group").get_attribute("title")))
 				except:
-					self._log("No sale price found using current css selectors")
-					self.set_sale_price("0.00")
-				try:
-					check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
-					if check != True:
-						self.set_third_party()
-				except:
-					pass
-				try:
-					#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
-					if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
-						self.set_out_of_stock()
-				except:
-					pass
-		finally:
-			self._kill_driver()
-			return
+					self._log("Failed to retrieve competitor price using any known css selector")
+				else:
+					try:
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+					except:
+						self._log("No sale price found using current css selectors")
+						self.set_sale_price("0.00")
+					try:
+						check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
+						if check != True:
+							self.set_third_party()
+					except:
+						pass
+					try:
+						#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
+						if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
+							self.set_out_of_stock()
+					except:
+						pass
+			finally:
+				self._kill_driver()
+		return
 
 	def _default(self):
 		self._log("Unknown Competitor ID")

@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import aux_func
 import csv
 #from io import StringIO   #what is this line for?
-#import sys   #what is this line for?
+import sys
 import os
 
 
@@ -171,21 +171,15 @@ class Entry:
 #Competitor specific methods
 
 	def _academy(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _acehardware(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _basspro(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _blain(self):
@@ -210,8 +204,10 @@ class Entry:
 							break
 						else:
 							continue
+					else:
+						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price using any known css selector")
+					self._log("Failed to retrieve competitor price: " + sys.last_value)
 				else:
 					try:
 						#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
@@ -229,15 +225,11 @@ class Entry:
 		return
 
 	def _bootbarn(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _cabela(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _dickeybub(self):
@@ -263,40 +255,32 @@ class Entry:
 							break
 						else:
 							continue
+					else:
+						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price using any known css selector")
+					self._log("Failed to retrieve competitor price: " + sys.last_value)
 			finally:
 				self._kill_driver()
 		return
 
 	def _home_depot(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _farm_and_home(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _lowes(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _menards(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _orscheln(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _ruralking(self):
@@ -339,9 +323,7 @@ class Entry:
 		return
 
 	def _sears(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _shelper(self):
@@ -366,8 +348,10 @@ class Entry:
 							break
 						else:
 							continue
+					else:
+						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price using any known css selector")
+					self._log("Failed to retrieve competitor price: " + sys.last_value)
 				else:
 					try:
 						self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML"))
@@ -379,15 +363,11 @@ class Entry:
 		return
 
 	def _tsc(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _valleyvet(self):
-		self._create_driver()
 		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
 		return
 
 	def _walmart(self):
@@ -404,9 +384,18 @@ class Entry:
 			else:
 				self.set_shop_date()
 				try:
-					self.set_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue").find_element_by_css_selector("span.Price-group").get_attribute("title")))
+					selectors = ["span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
+					for selector in selectors:
+						price = clean(driver.find_element_by_css_selector(selector).get_attribute("title")))
+						if price:
+							self.set_price(price)
+							break
+						else:
+							continue
+					else:
+						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price using any known css selector")
+					self._log("Failed to retrieve competitor price: " + sys.last_value)
 				else:
 					try:
 						self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))

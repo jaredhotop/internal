@@ -10,7 +10,10 @@ import os
 
 
 class Entry:
-	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url,ip):
+
+	machine_ip = aux_func.get_ip().split(".")
+
+	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
 		now = datetime.now()
 		self.unique_id = now.strftime("%Y%m%d")+comp_id+sku
@@ -36,8 +39,7 @@ class Entry:
 		self.comp_shop_out_of_stock = False
 		self.comp_shop_third_party = False
 		self.url = url
-		self.log_msg = None
-		self.machine_ip = ip
+		self.log_msg = ''
 		self.pagedata = None
 
 	def write_entry(self, file):
@@ -73,20 +75,21 @@ class Entry:
 	def set_price(self,price):
 		if isinstance(price, (int, long, float)):
 			self.comp_price = price
-			self._log("Set competitor price to: " + price)
+			self._log("Set competitor price to: " + str(price))
 		else:
-			self._log("Attempted to set competitor price as: {price} but it is not a number")
+			self._log("Attempted to set competitor price as: %s but it is not a number" %price)
 		return
 
 	def set_sale_price(self,price):
 		if isinstance(price, (int, long, float)):
 			self.comp_sale_price = price
-			self._log("Set competitor sale price to: " + price)
+			self._log("Set competitor sale price to: " + str(price))
 		else:
-			self._log("Attempted to set competitor sale price to: {price} but it is not a number")
+			self._log("Attempted to set competitor sale price to: %s but it is not a number" %price)
 		return
 
 	def set_shop_date(self):
+		now = datetime.now()
 		self.shop_date = now.strftime("%Y-%m-%d %H:%M:%S")
 		return
 
@@ -101,7 +104,7 @@ class Entry:
 		self._log("Set item as \"out of stock\"")
 		return
 
-	def set_unique_id:
+	def set_unique_id(self):
 		self.unique_id = self.unique_id + '1'
 		self._log("Corrected unique_id duplicate")
 		return
@@ -116,21 +119,22 @@ class Entry:
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=/home/test/.config/google-chrome")
+		chrome_options.add_argument("user-data-dir=/home/tommy/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created")
-		return self.driver_path
+		return self.driver
 
 	def _kill_driver(self):
 		self.driver.quit()
 		self._log("Driver destroyed")
 		return
 
-	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+ip[3]+"self._log.log")):
-		self.log_msg = self.Log_msg + " \n" + log_msg
+	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
+		self.log_msg = self.log_msg + " \n" + log_msg
+		now = datetime.now()
 		with open(file,"a") as f:
-			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.skum + " , Log Message: " + self.log_msg)
-		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.skum + " , Log Message: " + self.log_msg)
+			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
 	def crawl(self):
@@ -171,15 +175,15 @@ class Entry:
 #Competitor specific methods
 
 	def _academy(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _acehardware(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _basspro(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _blain(self):
@@ -207,11 +211,11 @@ class Entry:
 					else:
 						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price: " + sys.last_value)
+					self._log("Failed to retrieve competitor price")
 				else:
 					try:
 						#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
-						self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML"))
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML")))
 					except:
 						self._log("No sale price found using current css selectors")
 						self.set_sale_price("0.00")
@@ -225,11 +229,11 @@ class Entry:
 		return
 
 	def _bootbarn(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _cabela(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _dickeybub(self):
@@ -264,23 +268,23 @@ class Entry:
 		return
 
 	def _home_depot(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _farm_and_home(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _lowes(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _menards(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _orscheln(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _ruralking(self):
@@ -323,7 +327,7 @@ class Entry:
 		return
 
 	def _sears(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _shelper(self):
@@ -342,19 +346,21 @@ class Entry:
 				try:
 					selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
 					for selector in selectors:
-						price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
-						if price:
+						try:
+							price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
+						except:
+							pass
+						finally:
+							price = aux_func.clean(price.encode('utf-8'))
 							self.set_price(price)
 							break
-						else:
-							continue
 					else:
 						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price: " + sys.last_value)
+					self._log("Failed to retrieve competitor price")
 				else:
 					try:
-						self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML"))
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML")))
 					except:
 						self._log("No sale price found using current css selectors")
 						self.set_sale_price("0.00")
@@ -363,11 +369,11 @@ class Entry:
 		return
 
 	def _tsc(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _valleyvet(self):
-		self._log("Competitor: {self.comp_id} not yet defined")
+		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _walmart(self):
@@ -385,23 +391,25 @@ class Entry:
 				self.set_shop_date()
 				try:
 					selectors = ["span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
-					for selector in selectors:
-						price = clean(driver.find_element_by_css_selector(selector).get_attribute("title")))
-						if price:
+					for select in selectors:
+						try:
+							price = driver.find_element_by_css_selector(select).get_attribute('title')
+						except:
+							pass
+						finally:
+							price = float(aux_func.clean(price.encode('utf-8')))
 							self.set_price(price)
 							break
-						else:
-							continue
 					else:
 						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
-					self._log("Failed to retrieve competitor price: " + sys.last_value)
+					self._log("Failed to retrieve competitor price")
 				else:
 					try:
-						self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title")))
 					except:
 						self._log("No sale price found using current css selectors")
-						self.set_sale_price("0.00")
+						self.set_sale_price(0.00)
 					try:
 						check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
 						if check != True:

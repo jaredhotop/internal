@@ -13,6 +13,6 @@ def get_ip():
 		return IP
 
 def clean(string):
-	string = string.trim()
+	string = string.strip()
 	string = string.replace("$","")
 	return string

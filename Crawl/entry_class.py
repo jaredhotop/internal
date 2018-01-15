@@ -241,9 +241,32 @@ class Entry:
 		return
 
 	def _dickeybub(self):
-		self._create_driver()
-		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
+		try:
+			driver = self._create_driver()
+		except:
+			self._log("Driver failed to start")
+		else:
+			try:
+				driver.get(self._get_url())
+				self.pagedata = driver.page_source.encode('utf-8')
+			except:
+				self._log("Failed to retrieve url")
+			else:
+				self.set_shop_date()
+				try:
+					selectors = ["p.price > woocommerce-Price-amount amount"]
+					for selector in selectors:
+						price = clean(driver.find_element_by_css_selector().get_attribute("TEXT"))
+						if price:
+							self.set_price(price)
+							self.set_sale_price("0.00")
+							break
+						else:
+							continue
+				except:
+					self._log("Failed to retrieve competitor price using any known css selector")
+			finally:
+				self._kill_driver()
 		return
 
 	def _home_depot(self):
@@ -322,9 +345,37 @@ class Entry:
 		return
 
 	def _shelper(self):
-		self._create_driver()
-		self._log("Competitor: {self.comp_id} not yet defined")
-		self._kill_driver()
+		try:
+			driver = self._create_driver()
+		except:
+			self._log("Driver failed to start")
+		else:
+			try:
+				driver.get(self._get_url())
+				self.pagedata = driver.page_source.encode('utf-8')
+			except:
+				self._log("Failed to retrieve url")
+			else:
+				self.set_shop_date()
+				try:
+					selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
+					for selector in selectors:
+						price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
+						if price:
+							self.set_price(price)
+							break
+						else:
+							continue
+				except:
+					self._log("Failed to retrieve competitor price using any known css selector")
+				else:
+					try:
+						self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML"))
+					except:
+						self._log("No sale price found using current css selectors")
+						self.set_sale_price("0.00")
+			finally:
+				self._kill_driver()
 		return
 
 	def _tsc(self):

@@ -431,9 +431,10 @@ class Entry:
 			except:
 				self._log("Failed to retrieve url")
 			else:
+#Find Price
 				self.set_shop_date()
 				try:
-					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group","span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
+					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group","span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue:nth-child(2) > span.Price-group","span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
 					for select in selectors:
 						try:
 							price = driver.find_element_by_css_selector(select).get_attribute('title')
@@ -447,22 +448,21 @@ class Entry:
 						self._log("Failed to retrieve competitor price using any known css selector")
 				except:
 					self._log("Failed to retrieve competitor price")
+#Find Sale Price
 				else:
 					try:
 						self.set_sale_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group").get_attribute("title")))
 					except:
 						self._log("No sale price found using current css selectors")
 						self.set_sale_price(0.00)
+#check for Third party
 					try:
-						check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
-						if check != True:
-							self.set_third_party()
+						self.set_third_party() if not EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
 					except:
 						pass
+#check Out of stock
 					try:
-						#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
-						if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
-							self.set_out_of_stock()
+						self.set_out_of_stock() if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"))
 					except:
 						pass
 			finally:

@@ -24,6 +24,6 @@ for obj in search_arr:
 	obj.write_entry(os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/test_out"+ip[3]+".csv"))
 	written_arr.append(obj)
 	search_arr.pop()
-	if count == 200:
+	if count == 8:
 		break
 print("done")

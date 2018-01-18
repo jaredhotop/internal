@@ -134,8 +134,15 @@ class Entry:
 		now = datetime.now()
 		with open(file,"a") as f:
 			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
-		print("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg)
+		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
+
+	def _retrieve_data(self,selector,value):
+		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value)
+		if not temp:
+			return False
+		else:
+			return aux_func.clean(temp.encode('utf-8'))
 
 	def crawl(self):
 		self._log("Crawl intialized")
@@ -377,9 +384,10 @@ class Entry:
 		else:
 			try:
 				driver.get(self._get_url())
-				driver.find_element_by_css_selector(a.frsDeclineButton).click() if (EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton")):
 				self.pagedata = driver.page_source.encode('utf-8')
 				sku = driver.find_element_by_css_selector("input#catalogEntryID_pdp[value]").get_attribute("value")
+				if EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton"):
+					driver.find_element_by_css_selector(a.frsDeclineButton).click()
 			except:
 				self._log("Failed to retrieve url")
 			else:
@@ -434,35 +442,42 @@ class Entry:
 #Find Price
 				self.set_shop_date()
 				try:
-					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group","span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue:nth-child(2) > span.Price-group","span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
+					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group",\
+					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue:nth-child(2) > span.Price-group",\
+					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group",\
+					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group"]
 					for select in selectors:
 						try:
-							price = driver.find_element_by_css_selector(select).get_attribute('title')
-						except:
-							pass
-						finally:
-							price = aux_func.clean(price.encode('utf-8'))
+							price = self._retrieve_data(select,'title')
 							self.set_price(price)
 							break
-					else:
-						self._log("Failed to retrieve competitor price using any known css selector")
+						except:
+							continue
 				except:
 					self._log("Failed to retrieve competitor price")
 #Find Sale Price
 				else:
 					try:
-						self.set_sale_price(clean(driver.find_element_by_css_selector("span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group").get_attribute("title")))
+						selectors=["span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
+						for select in selectors:
+							try:
+								sale = self._retrieve_data(select,'title')
+							except:
+								continue
+							self.set_sale_price(sale)
 					except:
 						self._log("No sale price found using current css selectors")
 						self.set_sale_price(0.00)
 #check for Third party
 					try:
-						self.set_third_party() if not EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
+						if not EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]")):
+							self.set_third_party()
 					except:
 						pass
 #check Out of stock
 					try:
-						self.set_out_of_stock() if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"))
+						if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
+							self.set_out_of_stock()
 					except:
 						pass
 			finally:

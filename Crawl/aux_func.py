@@ -13,6 +13,8 @@ def get_ip():
 		return IP
 
 def clean(string):
+	non_decimal = re.compile(r'[^\d.]+')
+	string = non_decimal.sub('', string)
 	string = string.strip()
 	string = string.replace("$","")
-	return string
+	return float(string)

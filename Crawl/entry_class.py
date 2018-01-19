@@ -2,6 +2,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 import aux_func
 import csv
 #from io import StringIO   #what is this line for?
@@ -93,10 +94,10 @@ class Entry:
 		self.shop_date = now.strftime("%Y-%m-%d %H:%M:%S")
 		return
 
-	def set_third_party(self):
-		self.comp_shop_third_party = True
+	def set_third_party(self, bool_val = True):
+		self.comp_shop_third_party = bool_val
 		self.comp_match_id = 2
-		self._log("Set link as third party")
+		self._log("Set third party to " + str(bool_val))
 		return
 
 	def set_out_of_stock(self):
@@ -119,7 +120,7 @@ class Entry:
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=/home/tommy/.config/google-chrome")
+		chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created")
 		return self.driver
@@ -132,17 +133,24 @@ class Entry:
 	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		with open(file,"a") as f:
-			f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		# with open(file,"a") as f:
+		# 	f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
-	def _retrieve_data(self,selector,value):
-		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value)
+	def _retrieve_data(self,selector,value = None):
+		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value) if value else self.driver.find_element_by_css_selector(selector)
 		if not temp:
 			return False
 		else:
 			return aux_func.clean(temp.encode('utf-8'))
+
+	def _find_data(self,select,value = 'innerHTML'):
+		try:
+			 self.driver.find_element_by_css_selector(select).get_attribute(value)
+			 return True
+		except:
+			 return False
 
 	def crawl(self):
 		self._log("Crawl intialized")
@@ -413,12 +421,7 @@ class Entry:
 					except:
 						self._log("No sale price found using current css selectors")
 						self.set_sale_price(0.00)
-					# try:
-					# 	#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
-					# 	if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
-					# 		self.set_out_of_stock()
-					# except:
-					# 	pass
+
 			finally:
 				self._kill_driver()
 		return
@@ -443,13 +446,12 @@ class Entry:
 				self.set_shop_date()
 				try:
 					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group",\
-					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue:nth-child(2) > span.Price-group",\
+					"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group",\
 					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group",\
 					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group"]
 					for select in selectors:
 						try:
-							price = self._retrieve_data(select,'title')
-							self.set_price(price)
+							self.set_price(self._retrieve_data(select,'title'))
 							break
 						except:
 							continue
@@ -457,29 +459,26 @@ class Entry:
 					self._log("Failed to retrieve competitor price")
 #Find Sale Price
 				else:
-					try:
-						selectors=["span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group"]
-						for select in selectors:
-							try:
-								sale = self._retrieve_data(select,'title')
-							except:
-								continue
-							self.set_sale_price(sale)
-					except:
-						self._log("No sale price found using current css selectors")
-						self.set_sale_price(0.00)
+					self.set_sale_price(0.00)
 #check for Third party
 					try:
-						if not EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]")):
+						if not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
 							self.set_third_party()
+							if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
+								self.set_third_party(False)
+								sellers = driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+								for sell in sellers:
+									if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
+										self.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
+										break
 					except:
-						pass
+						self._log("Third party check failed")
 #check Out of stock
 					try:
-						if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
+						if self._find_data("span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"):
 							self.set_out_of_stock()
 					except:
-						pass
+						self._log("Out of stock check failed")
 			finally:
 				self._kill_driver()
 		return

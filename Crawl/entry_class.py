@@ -78,7 +78,7 @@ class Entry:
 			self.comp_price = price
 			self._log("Set competitor price to: " + str(price))
 		else:
-			self._log("Attempted to set competitor price as: %s but it is not a number" %price)
+			self._log("Attempted to set competitor price as: %s but it is not a number" %price,True)
 		return
 
 	def set_sale_price(self,price):
@@ -86,7 +86,7 @@ class Entry:
 			self.comp_sale_price = price
 			self._log("Set competitor sale price to: " + str(price))
 		else:
-			self._log("Attempted to set competitor sale price to: %s but it is not a number" %price)
+			self._log("Attempted to set competitor sale price to: %s but it is not a number" %price,True)
 		return
 
 	def set_shop_date(self):
@@ -97,12 +97,12 @@ class Entry:
 	def set_third_party(self, bool_val = True):
 		self.comp_shop_third_party = bool_val
 		self.comp_match_id = 2
-		self._log("Set third party to " + str(bool_val))
+		self._log("Set third party to " + str(bool_val),True)
 		return
 
 	def set_out_of_stock(self):
 		self.comp_shop_out_of_stock = True
-		self._log("Set item as \"out of stock\"")
+		self._log("Set item as \"out of stock\"",True)
 		return
 
 	def set_unique_id(self):
@@ -122,19 +122,20 @@ class Entry:
 		chrome_options.add_argument("--disable-gpu")
 		chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
-		self._log("Driver created")
+		self._log("Driver created",True)
 		return self.driver
 
 	def _kill_driver(self):
 		self.driver.quit()
-		self._log("Driver destroyed")
+		self._log("Driver destroyed",True)
 		return
 
-	def _log(self,log_msg,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
+	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		# with open(file,"a") as f:
-		# 	f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		if not print_only:
+			with open(file,"a") as f:
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -152,8 +153,48 @@ class Entry:
 		except:
 			 return False
 
+	def pricing(self,price_list,price_atr,sale_list = None,sale_atr = None):
+		try:
+			driver = self._create_driver()
+ 		except:
+ 			self._log("Driver failed to start")
+ 		else:
+ 			try:
+ 				driver.get(self._get_url())
+ 				self.pagedata = driver.page_source.encode('utf-8')
+ 			except:
+ 				self._log("Failed to retrieve url")
+ 			else:
+ #Find Price
+ 				self.set_shop_date()
+ 				try:
+ 					for select in price_list:
+ 						try:
+ 							self.set_price(self._retrieve_data(select,price_atr))
+ 							break
+ 						except:
+ 							continue
+ 				except:
+ 					self._log("Failed to retrieve competitor price")
+ #Find Sale Price
+ 				else:
+					if sale_list:
+						try:
+							for selector in sale_list:
+								try:
+									self.set_sale_price(self._retrieve_data(selector,sale_atr))
+									break
+								except:
+									continue
+						except:
+							self._log("No sale price found with current selectors")
+							self.set_sale_price(0.00)
+					else:
+						self.set_sale_price(0.00)
+		return
+
+
 	def crawl(self):
-		self._log("Crawl intialized")
 		switch = {
 			1 : self._academy,
 			2 : self._basspro,
@@ -202,46 +243,47 @@ class Entry:
 		return
 
 	def _blain(self):
-		try:
-			driver = self._create_driver()
-		except:
-			self._log("Driver failed to start")
-		else:
-			try:
-				driver.get(self._get_url())
-				self.pagedata = driver.page_source.encode('utf-8')
-			except:
-				self._log("Failed to retrieve url")
-			else:
-				self.set_shop_date()
-				try:
-					selectors = ["div.active-price>div.price>span","div.original-price>span.price>span"]
-					for select in selectors:
-						try:
-							price = clean(driver.find_element_by_css_selector(select).get_attribute("innerHTML"))
-						except:
-							continue
-						finally:
-							self.set_price(price)
-							break
-					else:
-						self._log("Failed to retrieve competitor price using any known css selector")
-				except:
-					self._log("Failed to retrieve competitor price")
-				else:
-					try:
-						#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
-						self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML")))
-					except:
-						self._log("No sale price found using current css selectors")
-						self.set_sale_price("0.00")
-					try:
-						if not (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.stock-msg.in-stock")):
-							self.set_out_of_stock()
-					except:
-						pass
-			finally:
-				self._kill_driver()
+		self._log("Competitor: %d not yet defined" %self.comp_id)
+		# try:
+		# 	driver = self._create_driver()
+		# except:
+		# 	self._log("Driver failed to start")
+		# else:
+		# 	try:
+		# 		driver.get(self._get_url())
+		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# 	except:
+		# 		self._log("Failed to retrieve url")
+		# 	else:
+		# 		self.set_shop_date()
+		# 		try:
+		# 			selectors = ["div.active-price>div.price>span","div.original-price>span.price>span"]
+		# 			for select in selectors:
+		# 				try:
+		# 					price = clean(driver.find_element_by_css_selector(select).get_attribute("innerHTML"))
+		# 				except:
+		# 					continue
+		# 				finally:
+		# 					self.set_price(price)
+		# 					break
+		# 			else:
+		# 				self._log("Failed to retrieve competitor price using any known css selector")
+		# 		except:
+		# 			self._log("Failed to retrieve competitor price")
+		# 		else:
+		# 			try:
+		# 				#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
+		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML")))
+		# 			except:
+		# 				self._log("No sale price found using current css selectors")
+		# 				self.set_sale_price("0.00")
+		# 			try:
+		# 				if not (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.stock-msg.in-stock")):
+		# 					self.set_out_of_stock()
+		# 			except:
+		# 				pass
+		# 	finally:
+		# 		self._kill_driver()
 		return
 
 	def _bootbarn(self):
@@ -253,34 +295,35 @@ class Entry:
 		return
 
 	def _dickeybub(self):
-		try:
-			driver = self._create_driver()
-		except:
-			self._log("Driver failed to start")
-		else:
-			try:
-				driver.get(self._get_url())
-				self.pagedata = driver.page_source.encode('utf-8')
-			except:
-				self._log("Failed to retrieve url")
-			else:
-				self.set_shop_date()
-				try:
-					selectors = ["p.price > woocommerce-Price-amount amount"]
-					for select in selectors:
-						price = clean(driver.find_element_by_css_selector(select).get_attribute("TEXT"))
-						if price:
-							self.set_price(price)
-							self.set_sale_price("0.00")
-							break
-						else:
-							continue
-					else:
-						self._log("Failed to retrieve competitor price using any known css selector")
-				except:
-					self._log("Failed to retrieve competitor price")
-			finally:
-				self._kill_driver()
+		self._log("Competitor: %d not yet defined" %self.comp_id)
+		# try:
+		# 	driver = self._create_driver()
+		# except:
+		# 	self._log("Driver failed to start")
+		# else:
+		# 	try:
+		# 		driver.get(self._get_url())
+		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# 	except:
+		# 		self._log("Failed to retrieve url")
+		# 	else:
+		# 		self.set_shop_date()
+		# 		try:
+		# 			selectors = ["p.price > woocommerce-Price-amount amount"]
+		# 			for select in selectors:
+		# 				price = clean(driver.find_element_by_css_selector(select).get_attribute("TEXT"))
+		# 				if price:
+		# 					self.set_price(price)
+		# 					self.set_sale_price("0.00")
+		# 					break
+		# 				else:
+		# 					continue
+		# 			else:
+		# 				self._log("Failed to retrieve competitor price using any known css selector")
+		# 		except:
+		# 			self._log("Failed to retrieve competitor price")
+		# 	finally:
+		# 		self._kill_driver()
 		return
 
 	def _home_depot(self):
@@ -347,83 +390,85 @@ class Entry:
 		return
 
 	def _shelper(self):
-		try:
-			driver = self._create_driver()
-		except:
-			self._log("Driver failed to start")
-		else:
-			try:
-				driver.get(self._get_url())
-				self.pagedata = driver.page_source.encode('utf-8')
-			except:
-				self._log("Failed to retrieve url")
-			else:
-				self.set_shop_date()
-				try:
-					selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
-					for selector in selectors:
-						try:
-							price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
-						except:
-							pass
-						finally:
-							price = aux_func.clean(price.encode('utf-8'))
-							self.set_price(price)
-							break
-					else:
-						self._log("Failed to retrieve competitor price using any known css selector")
-				except:
-					self._log("Failed to retrieve competitor price")
-				else:
-					try:
-						self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML")))
-					except:
-						self._log("No sale price found using current css selectors")
-						self.set_sale_price("0.00")
-			finally:
-				self._kill_driver()
+		self._log("Competitor: %d not yet defined" %self.comp_id)
+		# try:
+		# 	driver = self._create_driver()
+		# except:
+		# 	self._log("Driver failed to start")
+		# else:
+		# 	try:
+		# 		driver.get(self._get_url())
+		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# 	except:
+		# 		self._log("Failed to retrieve url")
+		# 	else:
+		# 		self.set_shop_date()
+		# 		try:
+		# 			selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
+		# 			for selector in selectors:
+		# 				try:
+		# 					price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
+		# 				except:
+		# 					pass
+		# 				finally:
+		# 					price = aux_func.clean(price.encode('utf-8'))
+		# 					self.set_price(price)
+		# 					break
+		# 			else:
+		# 				self._log("Failed to retrieve competitor price using any known css selector")
+		# 		except:
+		# 			self._log("Failed to retrieve competitor price")
+		# 		else:
+		# 			try:
+		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML")))
+		# 			except:
+		# 				self._log("No sale price found using current css selectors")
+		# 				self.set_sale_price("0.00")
+		# 	finally:
+		# 		self._kill_driver()
 		return
 
 	def _tsc(self):
-		try:
-			driver = self._create_driver()
-		except:
-			self._log("Driver failed to start")
-		else:
-			try:
-				driver.get(self._get_url())
-				self.pagedata = driver.page_source.encode('utf-8')
-				sku = driver.find_element_by_css_selector("input#catalogEntryID_pdp[value]").get_attribute("value")
-				if EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton"):
-					driver.find_element_by_css_selector(a.frsDeclineButton).click()
-			except:
-				self._log("Failed to retrieve url")
-			else:
-				self.set_shop_date()
-				try:
-					selectors = ["div.was_save_sku > span.was_text"]
-					for select in selectors:
-						try:
-							price = driver.find_element_by_css_selector(select).get_attribute('innerHTML')
-						except:
-							continue
-						finally:
-							price = aux_func.clean(price.encode('utf-8'))
-							self.set_price(price)
-							break
-					else:
-						self._log("Failed to retrieve competitor price using any known css selector")
-				except:
-					self._log("Failed to retrieve competitor price")
-				else:
-					try:
-						self.set_sale_price(aux_func.clean(driver.find_element_by_css_selector("span#offerPrice_%s" %sku).get_attribute("innerHTML").encode('utf-8')))
-					except:
-						self._log("No sale price found using current css selectors")
-						self.set_sale_price(0.00)
-
-			finally:
-				self._kill_driver()
+		self._log("Competitor: %d not yet defined" %self.comp_id)
+		# try:
+		# 	driver = self._create_driver()
+		# except:
+		# 	self._log("Driver failed to start")
+		# else:
+		# 	try:
+		# 		driver.get(self._get_url())
+		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# 		sku = driver.find_element_by_css_selector("input#catalogEntryID_pdp[value]").get_attribute("value")
+		# 		if EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton"):
+		# 			driver.find_element_by_css_selector(a.frsDeclineButton).click()
+		# 	except:
+		# 		self._log("Failed to retrieve url")
+		# 	else:
+		# 		self.set_shop_date()
+		# 		try:
+		# 			selectors = ["div.was_save_sku > span.was_text"]
+		# 			for select in selectors:
+		# 				try:
+		# 					price = driver.find_element_by_css_selector(select).get_attribute('innerHTML')
+		# 				except:
+		# 					continue
+		# 				finally:
+		# 					price = aux_func.clean(price.encode('utf-8'))
+		# 					self.set_price(price)
+		# 					break
+		# 			else:
+		# 				self._log("Failed to retrieve competitor price using any known css selector")
+		# 		except:
+		# 			self._log("Failed to retrieve competitor price")
+		# 		else:
+		# 			try:
+		# 				self.set_sale_price(aux_func.clean(driver.find_element_by_css_selector("span#offerPrice_%s" %sku).get_attribute("innerHTML").encode('utf-8')))
+		# 			except:
+		# 				self._log("No sale price found using current css selectors")
+		# 				self.set_sale_price(0.00)
+        #
+		# 	finally:
+		# 		self._kill_driver()
 		return
 
 	def _valleyvet(self):
@@ -431,55 +476,34 @@ class Entry:
 		return
 
 	def _walmart(self):
+		selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group",\
+		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group",\
+		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group",\
+		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group"]
 		try:
-			driver = self._create_driver()
+			self.pricing(selectors,'title')
 		except:
-			self._log("Driver failed to start")
-		else:
-			try:
-				driver.get(self._get_url())
-				self.pagedata = driver.page_source.encode('utf-8')
-			except:
-				self._log("Failed to retrieve url")
-			else:
-#Find Price
-				self.set_shop_date()
-				try:
-					selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group",\
-					"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group",\
-					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group",\
-					"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group"]
-					for select in selectors:
-						try:
-							self.set_price(self._retrieve_data(select,'title'))
-							break
-						except:
-							continue
-				except:
-					self._log("Failed to retrieve competitor price")
-#Find Sale Price
-				else:
-					self.set_sale_price(0.00)
+			self._log("Failed to aquire pricing data")
 #check for Third party
-					try:
-						if not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
-							self.set_third_party()
-							if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
-								self.set_third_party(False)
-								sellers = driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
-								for sell in sellers:
-									if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
-										self.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
-										break
-					except:
-						self._log("Third party check failed")
+		try:
+			if not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
+				self.set_third_party()
+				if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
+					self.set_third_party(False)
+					sellers = driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+					for sell in sellers:
+						if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
+							self.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
+							break
+		except:
+			self._log("Third party check failed")
 #check Out of stock
-					try:
-						if self._find_data("span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"):
-							self.set_out_of_stock()
-					except:
-						self._log("Out of stock check failed")
-			finally:
+		try:
+			if self._find_data("span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"):
+				self.set_out_of_stock()
+		except:
+			self._log("Out of stock check failed")
+		finally:
 				self._kill_driver()
 		return
 

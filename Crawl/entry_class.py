@@ -44,13 +44,13 @@ class Entry:
 		self.pagedata = None
 
 	def write_entry(self, file):
-		if (self.comp_price != None and self.comp_sale_price != None):
+		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
 			self._log("Writing entry to file: " + file)
 			with open(file, "a") as f:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
 		else:
-			self._log("Entry not written. comp_price or comp_sale_price is unset.")
+			self._log("Entry not written. comp_price or comp_sale_price is not valid.")
 		return
 
 	def _print_readable(self):
@@ -62,7 +62,7 @@ class Entry:
 		"comp_match_id","comp_shop_out_of_stock", "comp_shop_third_party")
 		values = self._data_tup()
 		for i in range(len(variables)):
-			print(variables[i],":",values[i])
+			print(variables[i],values[i])
 		return
 
 	def _data_tup(self):
@@ -133,9 +133,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		if not print_only:
-			with open(file,"a") as f:
-				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		# if not print_only:
+		# 	with open(file,"a") as f:
+		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -170,8 +170,12 @@ class Entry:
  				try:
  					for select in price_list:
  						try:
- 							self.set_price(self._retrieve_data(select,price_atr))
- 							break
+							price = self._retrieve_data(select,price_atr)
+							if price:
+ 								self.set_price(price)
+								break
+							else:
+								self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
  							continue
  				except:
@@ -182,10 +186,12 @@ class Entry:
 						try:
 							for selector in sale_list:
 								try:
-									self.set_sale_price(self._retrieve_data(selector,sale_atr))
+									self.set_sale_price(self._retrieve_data(selector,sale_atr)) if self._retrieve_data(selector,sale_atr) != self.comp_price else self.set_sale_price(0.00)
 									break
 								except:
 									continue
+							else:
+								self.set_sale_price(0.00)
 						except:
 							self._log("No sale price found with current selectors")
 							self.set_sale_price(0.00)
@@ -231,11 +237,28 @@ class Entry:
 #Competitor specific methods
 
 	def _academy(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = ["input#dlItemPrice"]
+		sale_selectors = ["span#currentPrice"]
+		try:
+			self.pricing(price_selectors,'value',sale_selectors,'innerHTML')
+		except:
+			self._log("Failed to aquire pricing data")
+#No third party
+#No out of stock
+		finally:
+			self._kill_driver()
 		return
 
 	def _acehardware(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = ["div.productPrice span script"]
+		try:
+			self.pricing(price_selectors,'innerHTML')
+		except:
+			self._log("Failed to aquire pricing data")
+#No third party
+#No out of stock
+		finally:
+			self._kill_driver()
 		return
 
 	def _basspro(self):
@@ -295,35 +318,15 @@ class Entry:
 		return
 
 	def _dickeybub(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			selectors = ["p.price > woocommerce-Price-amount amount"]
-		# 			for select in selectors:
-		# 				price = clean(driver.find_element_by_css_selector(select).get_attribute("TEXT"))
-		# 				if price:
-		# 					self.set_price(price)
-		# 					self.set_sale_price("0.00")
-		# 					break
-		# 				else:
-		# 					continue
-		# 			else:
-		# 				self._log("Failed to retrieve competitor price using any known css selector")
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price")
-		# 	finally:
-		# 		self._kill_driver()
+		price_selectors = ["p.price > del > span.woocommerce-Price-amount.amount",\
+		"p.price > span.woocommerce-Price-amount.amount"]
+		sale_selectors = ["p.price > ins > span.woocommerce-Price-amount.amount"]
+		try:
+			self.pricing(price_selectors,'innerHTML',sale_selectors,'innerHTML')
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _home_depot(self):
@@ -390,42 +393,16 @@ class Entry:
 		return
 
 	def _shelper(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
-		# 			for selector in selectors:
-		# 				try:
-		# 					price = clean(driver.find_element_by_css_selector(selector).get_attribute("innerHTML"))
-		# 				except:
-		# 					pass
-		# 				finally:
-		# 					price = aux_func.clean(price.encode('utf-8'))
-		# 					self.set_price(price)
-		# 					break
-		# 			else:
-		# 				self._log("Failed to retrieve competitor price using any known css selector")
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price")
-		# 		else:
-		# 			try:
-		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.product-content-inner > div.product-callout > h6.product-callout-title > strong").get_attribute("innerHTML")))
-		# 			except:
-		# 				self._log("No sale price found using current css selectors")
-		# 				self.set_sale_price("0.00")
-		# 	finally:
-		# 		self._kill_driver()
+		price_selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
+		sale_selectors = ["div.product-content-inner > div.product-callout > h6.product-callout-title > strong"]
+		try:
+			self.pricing(price_selectors,'innerHTML',sale_selectors,'innerHTML')
+		except:
+			self._log("Failed to acquire pricing data")
+#No third party
+#No out of stock 
+		finally:
+			self._kill_driver()
 		return
 
 	def _tsc(self):

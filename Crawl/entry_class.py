@@ -133,9 +133,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		# if not print_only:
-		# 	with open(file,"a") as f:
-		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		if not print_only:
+			with open(file,"a") as f:
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -275,7 +275,7 @@ class Entry:
 			self.pricing(price_selectors,sale_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
-#No third party 
+#No third party
 		try:
 			if not self._find_data("span.stock-msg.in-stock"):
 				self.set_out_of_stock()

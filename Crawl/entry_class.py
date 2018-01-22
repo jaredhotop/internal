@@ -153,7 +153,7 @@ class Entry:
 		except:
 			 return False
 
-	def pricing(self,price_list,price_atr,sale_list = None,sale_atr = None):
+	def pricing(self,price_dict,sale_dict = None):
 		try:
 			driver = self._create_driver()
  		except:
@@ -168,9 +168,10 @@ class Entry:
  #Find Price
  				self.set_shop_date()
  				try:
- 					for select in price_list:
+ 					for key,value in price_dict.iteritems():
+						print(key,value)
  						try:
-							price = self._retrieve_data(select,price_atr)
+							price = self._retrieve_data(key,value)
 							if price:
  								self.set_price(price)
 								break
@@ -182,11 +183,11 @@ class Entry:
  					self._log("Failed to retrieve competitor price")
  #Find Sale Price
  				else:
-					if sale_list:
+					if sale_dict:
 						try:
-							for selector in sale_list:
+							for key,value in sale_dict.iteritems():
 								try:
-									self.set_sale_price(self._retrieve_data(selector,sale_atr)) if self._retrieve_data(selector,sale_atr) != self.comp_price else self.set_sale_price(0.00)
+									self.set_sale_price(self._retrieve_data(key,value)) if self._retrieve_data(selector,sale_atr) != self.comp_price else self.set_sale_price(0.00)
 									break
 								except:
 									continue
@@ -237,10 +238,10 @@ class Entry:
 #Competitor specific methods
 
 	def _academy(self):
-		price_selectors = ["input#dlItemPrice"]
-		sale_selectors = ["span#currentPrice"]
+		price_selectors = {"input#dlItemPrice":"innerHTML",}
+		sale_selectors = {"span#currentPrice":"innerHTML",}
 		try:
-			self.pricing(price_selectors,'value',sale_selectors,'innerHTML')
+			self.pricing(price_selectors,sale_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #No third party
@@ -250,9 +251,9 @@ class Entry:
 		return
 
 	def _acehardware(self):
-		price_selectors = ["div.productPrice span script"]
+		price_selectors = {"div.productPrice span script":"innerHTML",}
 		try:
-			self.pricing(price_selectors,'innerHTML')
+			self.pricing(price_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #No third party
@@ -266,47 +267,22 @@ class Entry:
 		return
 
 	def _blain(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			selectors = ["div.active-price>div.price>span","div.original-price>span.price>span"]
-		# 			for select in selectors:
-		# 				try:
-		# 					price = clean(driver.find_element_by_css_selector(select).get_attribute("innerHTML"))
-		# 				except:
-		# 					continue
-		# 				finally:
-		# 					self.set_price(price)
-		# 					break
-		# 			else:
-		# 				self._log("Failed to retrieve competitor price using any known css selector")
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price")
-		# 		else:
-		# 			try:
-		# 				#https://www.farmandfleet.com/products/807682-blazer-international-led-emergency-mini-light-bar.html
-		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.active-price.promo > div.price > span:not([class])").get_attribute("innerHTML")))
-		# 			except:
-		# 				self._log("No sale price found using current css selectors")
-		# 				self.set_sale_price("0.00")
-		# 			try:
-		# 				if not (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.stock-msg.in-stock")):
-		# 					self.set_out_of_stock()
-		# 			except:
-		# 				pass
-		# 	finally:
-		# 		self._kill_driver()
+		price_selectors = {"meta[itemprop=lowprice]":"content",\
+		"div.active-price>div.price>span":"innerHTML",\
+		"div.original-price>span.price>span":"innerHTML"}
+		sale_selectors = {"div.active-price.promo > div.price > span:not([class])":"innerHTML",}
+		try:
+			self.pricing(price_selectors,sale_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+#No third party 
+		try:
+			if not self._find_data("span.stock-msg.in-stock"):
+				self.set_out_of_stock()
+		except:
+			self._log("Out of stock check failed")
+		finally:
+			self._kill_driver()
 		return
 
 	def _bootbarn(self):
@@ -318,11 +294,11 @@ class Entry:
 		return
 
 	def _dickeybub(self):
-		price_selectors = ["p.price > del > span.woocommerce-Price-amount.amount",\
-		"p.price > span.woocommerce-Price-amount.amount"]
-		sale_selectors = ["p.price > ins > span.woocommerce-Price-amount.amount"]
+		price_selectors = {"p.price > del > span.woocommerce-Price-amount.amount" : "innerHTML",\
+		"p.price > span.woocommerce-Price-amount.amount" : "innerHTML",}
+		sale_selectors = {"p.price > ins > span.woocommerce-Price-amount.amount" : "innerHTML",}
 		try:
-			self.pricing(price_selectors,'innerHTML',sale_selectors,'innerHTML')
+			self.pricing(price_selectors,sale_selectors,)
 		except:
 			self._log("Failed to acquire pricing data")
 		finally:
@@ -346,7 +322,16 @@ class Entry:
 		return
 
 	def _orscheln(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = {"span.product_unit_price" : "innerHTML",}
+		sale_selectors = {"",}
+		try:
+			self.pricing(price_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+#No third party
+#No out of stock
+		finally:
+			self._kill_driver()
 		return
 
 	def _ruralking(self):
@@ -393,14 +378,14 @@ class Entry:
 		return
 
 	def _shelper(self):
-		price_selectors = ["div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong"]
-		sale_selectors = ["div.product-content-inner > div.product-callout > h6.product-callout-title > strong"]
+		price_selectors = {"div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong" : "innerHTML",}
+		sale_selectors = {"div.product-content-inner > div.product-callout > h6.product-callout-title > strong" : "innerHTML",}
 		try:
-			self.pricing(price_selectors,'innerHTML',sale_selectors,'innerHTML')
+			self.pricing(price_selectors,sale_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
 #No third party
-#No out of stock 
+#No out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -423,7 +408,7 @@ class Entry:
 		# 	else:
 		# 		self.set_shop_date()
 		# 		try:
-		# 			selectors = ["div.was_save_sku > span.was_text"]
+		# 			selectors = {"div.was_save_sku > span.was_text",}
 		# 			for select in selectors:
 		# 				try:
 		# 					price = driver.find_element_by_css_selector(select).get_attribute('innerHTML')
@@ -453,12 +438,12 @@ class Entry:
 		return
 
 	def _walmart(self):
-		selectors = ["div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group",\
-		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group",\
-		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group",\
-		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group"]
+		price_selectors = {"div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group" : "title",\
+		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
+		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
+		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group" : "title",}
 		try:
-			self.pricing(selectors,'title')
+			self.pricing(price_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #check for Third party

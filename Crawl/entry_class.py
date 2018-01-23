@@ -120,7 +120,7 @@ class Entry:
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
+		chrome_options.add_argument("user-data-dir=/home/tommy/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver

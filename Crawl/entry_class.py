@@ -169,7 +169,6 @@ class Entry:
  				self.set_shop_date()
  				try:
  					for key,value in price_dict.iteritems():
-						print(key,value)
  						try:
 							price = self._retrieve_data(key,value)
 							if price:

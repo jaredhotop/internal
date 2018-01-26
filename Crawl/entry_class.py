@@ -45,7 +45,7 @@ class Entry:
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
-			self._log("Writing entry to file: " + file)
+			self._log("Writing entry to file: " + file,True)
 			with open(file, "a") as f:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
@@ -135,7 +135,7 @@ class Entry:
 		now = datetime.now()
 		if not print_only:
 			with open(file,"a") as f:
-				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " self.comp_id + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -447,20 +447,25 @@ class Entry:
 			self._log("Failed to aquire pricing data")
 #check for Third party
 		try:
-			if not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
-				self.set_third_party()
-				if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
-					self.set_third_party(False)
-					sellers = driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+			if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
+					sellers = self.driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
 					for sell in sellers:
 						if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
 							self.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
 							break
+			elif not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
+				self.set_third_party()
+
 		except:
+			raise
 			self._log("Third party check failed")
 #check Out of stock
 		try:
-			if self._find_data("span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]"):
+			try:
+				oos = self.driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")
+			except:
+				oos = "in stock"
+			if "Out of stock" in oos:
 				self.set_out_of_stock()
 		except:
 			self._log("Out of stock check failed")

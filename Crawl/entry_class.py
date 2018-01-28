@@ -141,9 +141,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		if not print_only:
-			with open(file,"a") as f:
-				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " self.comp_id + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		# if not print_only:
+		# 	with open(file,"a") as f:
+		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  self.comp_id + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -196,14 +196,16 @@ class Entry:
 						try:
 							for key,value in sale_dict.iteritems():
 								try:
-									self.set_sale_price(self._retrieve_data(key,value)) if self._retrieve_data(selector,sale_atr) != self.comp_price else self.set_sale_price(0.00)
+									self.set_sale_price(self._retrieve_data(key,value)) if self._retrieve_data(key,value) != self.comp_price else self.set_sale_price(0.00)
 									break
 								except:
 									continue
 							else:
+								raise
 								self._log("No sale price found with current selectors")
 								self.set_sale_price(0.00)
 						except:
+							raise
 							self._log("Failed to acquire sales price")
 							self.set_sale_price(0.00)
 					else:
@@ -336,12 +338,15 @@ class Entry:
 		if self.get_comp_id() == 27:
 			loc_ins = "loc_data.menards(self,'3293')"
 
-		price_selectors = {"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
+		price_selectors = {"span.bargainStrike" : "innerHTML",\
+		"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
 		"span#totalItemPriceFloater" : "innerHTML"}
-		sale_selectors = {""}
+		sale_selectors = {"span.bargainPrice" : "innerHTML", \
+		"span#totalItemPriceFloater" : "innerHTML"}
 		try:
-			self.pricing(price_selectors,None,loc_ins)
+			self.pricing(price_selectors,sale_selectors,loc_ins)
 		except:
+			raise
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()

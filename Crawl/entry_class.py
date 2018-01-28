@@ -4,7 +4,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import aux_func
+import loc_data
 import csv
+import shutil
 #from io import StringIO   #what is this line for?
 import sys
 import os
@@ -116,11 +118,17 @@ class Entry:
 	def get_unique_id(self):
 		return self.unique_id
 
+	def get_driver(self):
+		return self.driver
+
+	def get_comp_id(self):
+		return self.comp_id
+
 	def _create_driver(self):
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=/home/tommy/.config/google-chrome")
+		chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver
@@ -133,9 +141,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		if not print_only:
-			with open(file,"a") as f:
-				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
+		# if not print_only:
+		# 	with open(file,"a") as f:
+		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + " , sku: " + self.sku + " , Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -153,13 +161,15 @@ class Entry:
 		except:
 			 return False
 
-	def pricing(self,price_dict,sale_dict = None):
+	def pricing(self,price_dict,sale_dict = None,loc_ins = None):
 		try:
 			driver = self._create_driver()
  		except:
  			self._log("Driver failed to start")
  		else:
  			try:
+				if loc_ins:
+					eval(loc_ins)
  				driver.get(self._get_url())
  				self.pagedata = driver.page_source.encode('utf-8')
  			except:
@@ -169,7 +179,6 @@ class Entry:
  				self.set_shop_date()
  				try:
  					for key,value in price_dict.iteritems():
-						print(key,value)
  						try:
 							price = self._retrieve_data(key,value)
 							if price:
@@ -192,9 +201,10 @@ class Entry:
 								except:
 									continue
 							else:
+								self._log("No sale price found with current selectors")
 								self.set_sale_price(0.00)
 						except:
-							self._log("No sale price found with current selectors")
+							self._log("Failed to acquire sales price")
 							self.set_sale_price(0.00)
 					else:
 						self.set_sale_price(0.00)
@@ -318,7 +328,24 @@ class Entry:
 		return
 
 	def _menards(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		loc_ins = None
+		if self.get_comp_id() == 7:
+			loc_ins = "loc_data.menards(self,'3286')"
+		if self.get_comp_id() == 26:
+			loc_ins = "loc_data.menards(self,'3334')"
+		if self.get_comp_id() == 27:
+			loc_ins = "loc_data.menards(self,'3293')"
+
+		price_selectors = {"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
+		"span#totalItemPriceFloater" : "innerHTML"}
+		sale_selectors = {""}
+		try:
+			self.pricing(price_selectors,None,loc_ins)
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
+			# os.remove(os.path.expanduser('~/.config/google-chrome/Default/Cookies'))
 		return
 
 	def _orscheln(self):

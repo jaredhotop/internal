@@ -42,6 +42,7 @@ class Entry:
 		self.comp_shop_out_of_stock = False
 		self.comp_shop_third_party = False
 		self.url = url
+		self.broken_flag = False
 		self.log_msg = ''
 		self.pagedata = None
 
@@ -51,8 +52,13 @@ class Entry:
 			with open(file, "a") as f:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
+		elif self.broken_link:
+			self._log("Entry not valid. Writing to alternate file.")
+			self._log("Link flagged as broken",False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
 		else:
-			self._log("Entry not written. comp_price or comp_sale_price is not valid.")
+			self._log("Entry not valid. Writing to alternate file.")
+			self._log("Closer inspection needed, URL: %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+
 		return
 
 	def _print_readable(self):
@@ -86,7 +92,8 @@ class Entry:
 	def set_sale_price(self,price):
 		if isinstance(price, (int, long, float)):
 			self.comp_sale_price = price
-			self._log("Set competitor sale price to: " + str(price))
+			if price != 0.00:
+				self._log("Set competitor sale price to: " + str(price))
 		else:
 			self._log("Attempted to set competitor sale price to: %s but it is not a number" %price,True)
 		return
@@ -124,11 +131,21 @@ class Entry:
 	def get_comp_id(self):
 		return self.comp_id
 
+	def _get_broken(self):
+		if self.broken_flag:
+			print(True)
+		else:
+			print(False)
+		return
+
+	def _get_price(self):
+		return self.comp_price
+
 	def _create_driver(self):
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=/home/jayson/.config/google-chrome")
+		chrome_options.add_argument("user-data-dir=%s" %os.path.expanduser('~/.config/google-chrome'))
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver
@@ -156,12 +173,12 @@ class Entry:
 
 	def _find_data(self,select,value = 'innerHTML'):
 		try:
-			 self.driver.find_element_by_css_selector(select).get_attribute(value)
-			 return True
+			self.driver.find_element_by_css_selector(select).get_attribute(value)
+			return True
 		except:
 			 return False
 
-	def pricing(self,price_dict,sale_dict = None,loc_ins = None):
+	def pricing(self,price_dict,sale_dict = None,broken_dict = None,loc_ins = None):
 		try:
 			driver = self._create_driver()
  		except:
@@ -201,15 +218,19 @@ class Entry:
 								except:
 									continue
 							else:
-								raise
 								self._log("No sale price found with current selectors")
 								self.set_sale_price(0.00)
 						except:
-							raise
 							self._log("Failed to acquire sales price")
 							self.set_sale_price(0.00)
 					else:
 						self.set_sale_price(0.00)
+				try:
+					for key,value in broken_dict.iteritems():
+						if self._find_data(key,value):
+							self.broken_flag = True
+				except:
+					pass
 		return
 
 
@@ -250,14 +271,23 @@ class Entry:
 #Competitor specific methods
 
 	def _academy(self):
-		price_selectors = {"input#dlItemPrice":"innerHTML",}
+		price_selectors = {"input#dlItemPrice":"value",}
 		sale_selectors = {"span#currentPrice":"innerHTML",}
 		try:
 			self.pricing(price_selectors,sale_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #No third party
-#No out of stock
+#check out of stock
+		try:
+			try:
+				oos = self.driver.find_element_by_css_selector("button#add2CartBtn").get_attribute("innerHTML")
+			except:
+				oos = "in stock"
+			if "Out of Stock" in oos:
+				self.set_out_of_stock()
+		except:
+			self._log("Out of stock check failed")
 		finally:
 			self._kill_driver()
 		return
@@ -330,7 +360,6 @@ class Entry:
 		return
 
 	def _menards(self):
-		loc_ins = None
 		if self.get_comp_id() == 7:
 			loc_ins = "loc_data.menards(self,'3286')"
 		if self.get_comp_id() == 26:
@@ -346,7 +375,6 @@ class Entry:
 		try:
 			self.pricing(price_selectors,sale_selectors,loc_ins)
 		except:
-			raise
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()
@@ -424,14 +452,17 @@ class Entry:
 
 	def _tsc(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
+		# location
+		# if
+		# block
+		return
+		price_selectors = {"":""}
+		sale_selectors = {"":""}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			self._log("Failed to acquire pricing data")
 		# 		sku = driver.find_element_by_css_selector("input#catalogEntryID_pdp[value]").get_attribute("value")
 		# 		if EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton"):
 		# 			driver.find_element_by_css_selector(a.frsDeclineButton).click()
@@ -457,13 +488,7 @@ class Entry:
 		# 		else:
 		# 			try:
 		# 				self.set_sale_price(aux_func.clean(driver.find_element_by_css_selector("span#offerPrice_%s" %sku).get_attribute("innerHTML").encode('utf-8')))
-		# 			except:
-		# 				self._log("No sale price found using current css selectors")
-		# 				self.set_sale_price(0.00)
-        #
-		# 	finally:
-		# 		self._kill_driver()
-		return
+
 
 	def _valleyvet(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
@@ -474,8 +499,9 @@ class Entry:
 		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
 		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
 		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group" : "title",}
+		broken_link_selectors = {"div.font-semibold.prod-Bot-partial-head" : "innerHTML"}
 		try:
-			self.pricing(price_selectors)
+			self.pricing(price_selectors,None,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #check for Third party
@@ -490,7 +516,6 @@ class Entry:
 				self.set_third_party()
 
 		except:
-			raise
 			self._log("Third party check failed")
 #check Out of stock
 		try:

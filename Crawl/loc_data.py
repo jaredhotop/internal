@@ -9,5 +9,5 @@ def menards(obj,store):
     driver = obj.get_driver()
     driver.get("https://www.menards.com/main/storeDetails.html?store=%s&setMyStore=true/" %store)
     driver.find_element_by_link_text("Make My Store").click()
-    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/test.png"))
+    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
     return driver

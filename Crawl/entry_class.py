@@ -52,12 +52,12 @@ class Entry:
 			with open(file, "a") as f:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
-		elif self.broken_link:
+		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Link flagged as broken",False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, URL: %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
 
 		return
 
@@ -158,9 +158,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		# if not print_only:
-		# 	with open(file,"a") as f:
-		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  self.comp_id + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		if not print_only:
+			with open(file,"a") as f:
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -218,7 +218,8 @@ class Entry:
 								except:
 									continue
 							else:
-								self._log("No sale price found with current selectors")
+								if self.comp_price != None:
+									self._log("No sale price found with current selectors")
 								self.set_sale_price(0.00)
 						except:
 							self._log("Failed to acquire sales price")
@@ -273,8 +274,9 @@ class Entry:
 	def _academy(self):
 		price_selectors = {"input#dlItemPrice":"value",}
 		sale_selectors = {"span#currentPrice":"innerHTML",}
+		broken_link_selectors = {"p#search_results_total_count":"innerHTML"}
 		try:
-			self.pricing(price_selectors,sale_selectors)
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #No third party
@@ -313,8 +315,9 @@ class Entry:
 		"div.active-price>div.price>span":"innerHTML",\
 		"div.original-price>span.price>span":"innerHTML"}
 		sale_selectors = {"div.active-price.promo > div.price > span:not([class])":"innerHTML",}
+		broken_link_selectors = {"div.list-header-text > span":"innerHTML"}
 		try:
-			self.pricing(price_selectors,sale_selectors)
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
 #No third party
@@ -372,8 +375,9 @@ class Entry:
 		"span#totalItemPriceFloater" : "innerHTML"}
 		sale_selectors = {"span.bargainPrice" : "innerHTML", \
 		"span#totalItemPriceFloater" : "innerHTML"}
+		broken_link_selectors = {"h3.resettitle":"innerHTML"}
 		try:
-			self.pricing(price_selectors,sale_selectors,loc_ins)
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
 			self._log("Failed to acquire pricing data")
 		finally:
@@ -499,9 +503,11 @@ class Entry:
 		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
 		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
 		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group" : "title",}
-		broken_link_selectors = {"div.font-semibold.prod-Bot-partial-head" : "innerHTML"}
+		broken_link_selectors = {"div.font-semibold.prod-Bot-partial-head" : "innerHTML",\
+		"p.error-ErrorPage-copy":"innerHTML"}
+		sale_selectors = {}
 		try:
-			self.pricing(price_selectors,None,broken_link_selectors)
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
 #check for Third party

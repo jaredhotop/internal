@@ -11,3 +11,10 @@ def menards(obj,store):
     driver.find_element_by_link_text("Make My Store").click()
     driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
     return driver
+
+def tsc(obj,store):
+    driver = obj.get_driver()
+    driver.get("https://www.tractorsupply.com/tsc/store-locator?zipCode=%s" %store)
+    driver.find_element_by_css_selector("span.makemystore_link_sl_sr.underlinehover").click()
+    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
+    return driver

@@ -1,3 +1,7 @@
+# Competitor pricing crawler v1.0
+# written by: Jayson Scruggs
+# Property of Buchheit
+
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -158,9 +162,9 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		if not print_only:
-			with open(file,"a") as f:
-				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		# if not print_only:
+		# 	with open(file,"a") as f:
+		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -201,8 +205,8 @@ class Entry:
 							if price:
  								self.set_price(price)
 								break
-							else:
-								self._log("Retrieve_data return false. Check your selector and attribute values")
+							# else:
+							# 	self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
  							continue
  				except:
@@ -455,13 +459,14 @@ class Entry:
 		return
 
 	def _tsc(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		# location
-		# if
-		# block
-		return
-		price_selectors = {"":""}
-		sale_selectors = {"":""}
+		# self._log("Competitor: %d not yet defined" %self.comp_id)
+		# # location
+		# # if
+		# # block
+		# return
+		loc_ins = None
+		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
+		sale_selectors = {"span.dollar_price":"innerHTML"}
 		broken_link_selectors = {"":""}
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
@@ -492,7 +497,9 @@ class Entry:
 		# 		else:
 		# 			try:
 		# 				self.set_sale_price(aux_func.clean(driver.find_element_by_css_selector("span#offerPrice_%s" %sku).get_attribute("innerHTML").encode('utf-8')))
-
+		finally:
+			self._kill_driver()
+		return
 
 	def _valleyvet(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)

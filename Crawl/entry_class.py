@@ -14,6 +14,7 @@ import shutil
 #from io import StringIO   #what is this line for?
 import sys
 import os
+import time
 
 
 class Entry:
@@ -149,7 +150,8 @@ class Entry:
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("user-data-dir=%s" %os.path.expanduser('~/.config/google-chrome'))
+		chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
+		# chrome_options.add_argument("user-data-dir=%s" %os.path.expanduser('~/.config/google-chrome'))
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver
@@ -192,8 +194,13 @@ class Entry:
 				if loc_ins:
 					eval(loc_ins)
  				driver.get(self._get_url())
- 				self.pagedata = driver.page_source.encode('utf-8')
+				driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
+				self.pagedata = driver.page_source.encode('utf-8')
+				with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
+					f.write(self.pagedata)
+
  			except:
+				raise
  				self._log("Failed to retrieve url")
  			else:
  #Find Price
@@ -208,8 +215,10 @@ class Entry:
 							# else:
 							# 	self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
+							raise
  							continue
  				except:
+					raise
  					self._log("Failed to retrieve competitor price")
  #Find Sale Price
  				else:
@@ -369,9 +378,9 @@ class Entry:
 	def _menards(self):
 		if self.get_comp_id() == 7:
 			loc_ins = "loc_data.menards(self,'3286')"
-		if self.get_comp_id() == 26:
+		elif self.get_comp_id() == 26:
 			loc_ins = "loc_data.menards(self,'3334')"
-		if self.get_comp_id() == 27:
+		elif self.get_comp_id() == 27:
 			loc_ins = "loc_data.menards(self,'3293')"
 
 		price_selectors = {"span.bargainStrike" : "innerHTML",\
@@ -391,9 +400,10 @@ class Entry:
 
 	def _orscheln(self):
 		price_selectors = {"span.product_unit_price" : "innerHTML",}
-		sale_selectors = {"",}
+		sale_selectors = {"":""}
+		broken_link_selectors = {"":""}
 		try:
-			self.pricing(price_selectors)
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
 #No third party
@@ -442,12 +452,24 @@ class Entry:
 		return
 
 	def _sears(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = {"span.price-wrapper":"innerHTML"}
+		sale_selectors = {"h4.redSalePrice span.price-wrapper":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			raise
+			self._log("Failed to acquire pricing data")
+#No Third Party
+#No out of Stock
+		finally:
+			self._kill_driver()
 		return
 
 	def _shelper(self):
 		price_selectors = {"div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong" : "innerHTML",}
 		sale_selectors = {"div.product-content-inner > div.product-callout > h6.product-callout-title > strong" : "innerHTML",}
+		broken_link_selectors = {"":""}
 		try:
 			self.pricing(price_selectors,sale_selectors)
 		except:
@@ -459,12 +481,14 @@ class Entry:
 		return
 
 	def _tsc(self):
-		# self._log("Competitor: %d not yet defined" %self.comp_id)
-		# # location
-		# # if
-		# # block
-		# return
-		loc_ins = None
+		#view in cart item
+		# https://www.tractorsupply.com/tsc/product/jonsered-502cc-gas-chainsaw-cs2250s?cm_vc=-10005
+		if self.get_comp_id() == 73:
+			loc_ins = "loc_data.tsc(self,'63049')"
+		elif self.get_comp_id() == 74:
+			loc_ins = "loc_data.tsc(self,'63701')"
+		elif self.get_comp_id() == 8:
+			loc_ins = "loc_data.tsc(self,'63640')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}
 		broken_link_selectors = {"":""}
@@ -472,31 +496,8 @@ class Entry:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
 			self._log("Failed to acquire pricing data")
-		# 		sku = driver.find_element_by_css_selector("input#catalogEntryID_pdp[value]").get_attribute("value")
-		# 		if EC.presence_of_element_located(BY.CSS_SELECTOR,"a.frsDeclineButton"):
-		# 			driver.find_element_by_css_selector(a.frsDeclineButton).click()
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			selectors = {"div.was_save_sku > span.was_text",}
-		# 			for select in selectors:
-		# 				try:
-		# 					price = driver.find_element_by_css_selector(select).get_attribute('innerHTML')
-		# 				except:
-		# 					continue
-		# 				finally:
-		# 					price = aux_func.clean(price.encode('utf-8'))
-		# 					self.set_price(price)
-		# 					break
-		# 			else:
-		# 				self._log("Failed to retrieve competitor price using any known css selector")
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price")
-		# 		else:
-		# 			try:
-		# 				self.set_sale_price(aux_func.clean(driver.find_element_by_css_selector("span#offerPrice_%s" %sku).get_attribute("innerHTML").encode('utf-8')))
+#no third party
+#no out of stock
 		finally:
 			self._kill_driver()
 		return

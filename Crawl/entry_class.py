@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import aux_func
 import loc_data
 import csv
@@ -372,7 +373,25 @@ class Entry:
 		return
 
 	def _lowes(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		if self.get_comp_id() == 6:
+			loc_ins = "loc_data.lowes(self,63028)"
+		elif self.get_comp_id() == 15:
+			loc_ins = "loc_data.lowes(self,63701)"
+		elif self.get_comp_id() == 16:
+			loc_ins = "loc_data.lowes(self,62704)"
+		elif self.get_comp_id() == 24:
+			loc_ins = "loc_data.lowes(self,62221)"
+		price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
+		"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
+		sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			raise
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _menards(self):

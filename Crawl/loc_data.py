@@ -39,3 +39,12 @@ def lowes(obj,store):
     driver.find_element_by_class_name("js-store-locator-select-store").click()
     driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
     return driver
+
+def home_depot(obj,store):
+    driver.get("https://www.homedepot.com/l/search/")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "storeSearchBox")))
+    driver.find_element_by_id("storeSearchBox").send_keys(store,Keys.ENTER)
+    WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "a.bttn-outline[data-storeid]")))
+    driver.find_element_by_css_selector("a.bttn-outline[data-storeid]").click()
+    WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "span.sfmystoreicon")))
+    return driver

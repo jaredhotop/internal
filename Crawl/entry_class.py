@@ -347,6 +347,19 @@ class Entry:
 	def _bootbarn(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
+		price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
+		"h6.product-callout-title > strong":"innerHTML"}
+		sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to aquire pricing data")
+#no third Party
+#no out of stock
+		finally:
+			self._kill_driver()
+		return
 
 	def _cabela(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
@@ -366,6 +379,23 @@ class Entry:
 
 	def _home_depot(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		return
+		if self.get_comp_id() == 23:
+			loc_ins = ""
+		elif self.get_comp_id() == 5:
+			loc_ins = ""
+		elif self.get_comp_id() == 17:
+			loc_ins = ""
+		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML",\
+		"span#ajaxPrice":"content"}
+		sale_selectors = {"span#ajaxPrice":"content"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _farm_and_home(self):
@@ -510,7 +540,7 @@ class Entry:
 			loc_ins = "loc_data.tsc(self,'63640')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}
-		broken_link_selectors = {"":""}
+		broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:

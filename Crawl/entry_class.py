@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import aux_func
 import loc_data
 import csv
@@ -348,6 +349,19 @@ class Entry:
 	def _bootbarn(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
+		price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
+		"h6.product-callout-title > strong":"innerHTML"}
+		sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to aquire pricing data")
+#no third Party
+#no out of stock
+		finally:
+			self._kill_driver()
+		return
 
 	def _cabela(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
@@ -368,13 +382,48 @@ class Entry:
 	def _home_depot(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
+		if self.get_comp_id() == 23:
+			loc_ins = ""
+		elif self.get_comp_id() == 5:
+			loc_ins = ""
+		elif self.get_comp_id() == 17:
+			loc_ins = ""
+		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML",\
+		"span#ajaxPrice":"content"}
+		sale_selectors = {"span#ajaxPrice":"content"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
+		return
 
 	def _farm_and_home(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
 		return
 
 	def _lowes(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		if self.get_comp_id() == 6:
+			loc_ins = "loc_data.lowes(self,63028)"
+		elif self.get_comp_id() == 15:
+			loc_ins = "loc_data.lowes(self,63701)"
+		elif self.get_comp_id() == 16:
+			loc_ins = "loc_data.lowes(self,62704)"
+		elif self.get_comp_id() == 24:
+			loc_ins = "loc_data.lowes(self,62221)"
+		price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
+		"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
+		sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			raise
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _menards(self):
@@ -493,7 +542,7 @@ class Entry:
 			loc_ins = "loc_data.tsc(self,'63640')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}
-		broken_link_selectors = {"":""}
+		broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:

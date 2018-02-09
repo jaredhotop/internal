@@ -20,6 +20,7 @@ import time
 class Entry:
 
 	machine_ip = aux_func.get_ip().split(".")
+	
 
 	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
@@ -157,8 +158,11 @@ class Entry:
 		return self.driver
 
 	def _kill_driver(self):
-		self.driver.quit()
-		self._log("Driver destroyed",True)
+		if self.driver:
+			self.driver.quit()
+			self._log("Driver destroyed",True)
+		else:
+			self._log("Error driver doesn't exist")
 		return
 
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
@@ -215,10 +219,8 @@ class Entry:
 							# else:
 							# 	self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
-							raise
  							continue
  				except:
-					raise
  					self._log("Failed to retrieve competitor price")
  #Find Sale Price
  				else:

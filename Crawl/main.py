@@ -1,4 +1,6 @@
-#import crawl_class
+# Competitor pricing crawler v1.0
+# written by: Jayson Scruggs
+# Property of Buchheit
 import set_loc
 import entry_class
 import aux_func

@@ -12,16 +12,18 @@ import aux_func
 import loc_data
 import csv
 import shutil
+import os
 #from io import StringIO   #what is this line for?
 import sys
-import os
+sys.path.append( os.path.expanduser("~/Documents"))
+from crawlconfig import *
 import time
 
 
 class Entry:
 
 	machine_ip = aux_func.get_ip().split(".")
-	
+
 
 	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
@@ -169,9 +171,10 @@ class Entry:
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		# if not print_only:
-		# 	with open(file,"a") as f:
-		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		if not test_mach:
+			if not print_only:
+				with open(file,"a") as f:
+					f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -193,6 +196,7 @@ class Entry:
 		try:
 			driver = self._create_driver()
  		except:
+			self.driver = None
  			self._log("Driver failed to start")
  		else:
  			try:
@@ -364,7 +368,16 @@ class Entry:
 		return
 
 	def _cabela(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = {"dd.regularnprange":"innerHTML",\
+		"div.price > dl > dd.nprange":"innerHTML"}
+		sale_selectors = {"dd.saleprice":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _dickeybub(self):

@@ -16,7 +16,10 @@ import os
 #from io import StringIO   #what is this line for?
 import sys
 sys.path.append( os.path.expanduser("~/Documents"))
-from crawlconfig import *
+try:
+	from crawlconfig import *
+except:
+	test_mach = 0
 import time
 
 
@@ -63,10 +66,10 @@ class Entry:
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
 
 		return
 
@@ -168,13 +171,12 @@ class Entry:
 			self._log("Error driver doesn't exist")
 		return
 
-	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
+	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/"+machine_ip[3]+"self_log.log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		if not test_mach:
-			if not print_only:
-				with open(file,"a") as f:
-					f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		if not print_only and not test_mach:
+			with open(file,"a") as f:
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 

@@ -4,17 +4,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import entry_class
-try:
-    from os.path.expanduser("~/Documents/.crawlconfig.py") import *
-except:
-    test_mach = 0
 
 
-print(test_mach)
-# obj = entry_class.Entry('3','1234','4665',False,False,'1',\
-# 'https://www.farmandfleet.com/products/g-9127-work-n-sport-mens-plaid-short-sleeve-button-down-shirt.html')
-# obj.crawl()
-# obj._print_readable()
+obj = entry_class.Entry('3','1234','4665',False,False,'1',\
+'https://www.farmandfleet.com/products/g-9127-work-n-sport-mens-plaid-short-sleeve-button-down-shirt.html')
+obj.crawl()
+obj._print_readable()
 # url = 'https://www.orschelnfarmhome.com/view/product/si-waterproof-steel-toe-knee-work-boots-14-in/si5855988'
 # chrome_options = Options()
 # # chrome_options.add_argument("--headless")

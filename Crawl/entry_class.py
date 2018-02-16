@@ -211,7 +211,6 @@ class Entry:
 					f.write(self.pagedata)
 
  			except:
-				raise
  				self._log("Failed to retrieve url")
  			else:
  #Find Price
@@ -435,7 +434,6 @@ class Entry:
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
-			raise
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()
@@ -524,7 +522,6 @@ class Entry:
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
-			raise
 			self._log("Failed to acquire pricing data")
 #No Third Party
 #No out of Stock

@@ -178,7 +178,7 @@ class Entry:
 			self._log("Error driver doesn't exist")
 		return
 
-	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/"+machine_ip[3]+"self_log.log")):
+	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine"+machine_ip[3]+".log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
 		if not print_only and not test_mach:

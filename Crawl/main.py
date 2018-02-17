@@ -8,7 +8,7 @@ import os
 import csv
 
 ip = aux_func.get_ip().split(".")
-file_name = os.path.expanduser("/media/WebCrawl/testrun"+ip[3]+".csv")
+file_name = os.path.expanduser("/media/WebCrawl/inputs/testrun"+ip[3]+".csv")
 search_arr = written_arr = []
 with open(file_name,"r" )as f:
 	r = csv.reader(f,delimiter = ",")
@@ -21,7 +21,7 @@ for obj in search_arr:
 		if obj.get_unique_id == entry.get_unique_id:
 			obj.set_unique_id
 	obj.crawl()
-	obj.write_entry(os.path.expanduser("/media/WebCrawl/test_out"+ip[3]+".csv"))
+	obj.write_entry(os.path.expanduser("/media/WebCrawl/outputs/test_out"+ip[3]+".csv"))
 	written_arr.append(obj)
 	search_arr.pop()
 print("done")

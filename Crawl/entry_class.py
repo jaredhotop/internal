@@ -57,6 +57,7 @@ class Entry:
 		self.broken_flag = False
 		self.log_msg = ''
 		self.pagedata = None
+		self.defined = True
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
@@ -67,6 +68,8 @@ class Entry:
 		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
 			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
+		elif not self.defined:
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
 			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
@@ -129,6 +132,10 @@ class Entry:
 	def set_unique_id(self):
 		self.unique_id = self.unique_id + '1'
 		self._log("Corrected unique_id duplicate")
+		return
+
+	def set_undefined(self):
+		self.defined = False
 		return
 
 	def _get_url(self):
@@ -329,6 +336,7 @@ class Entry:
 
 	def _basspro(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _blain(self):
@@ -352,8 +360,6 @@ class Entry:
 		return
 
 	def _bootbarn(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		return
 		price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
 		"h6.product-callout-title > strong":"innerHTML"}
 		sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
@@ -395,6 +401,7 @@ class Entry:
 
 	def _home_depot(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 		if self.get_comp_id() == 23:
 			loc_ins = ""
@@ -416,6 +423,7 @@ class Entry:
 
 	def _farm_and_home(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _lowes(self):
@@ -477,6 +485,7 @@ class Entry:
 		return
 
 	def _ruralking(self):
+
 		# try:
 		# 	driver = self._create_driver()
 		# except:
@@ -513,6 +522,8 @@ class Entry:
 		# 				pass
 		# 	finally:
 		# 		self._kill_driver()
+		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _sears(self):
@@ -567,6 +578,7 @@ class Entry:
 
 	def _valleyvet(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _walmart(self):
@@ -610,4 +622,5 @@ class Entry:
 
 	def _default(self):
 		self._log("Unknown Competitor ID")
+		self.set_undefined()
 		return

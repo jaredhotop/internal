@@ -165,7 +165,6 @@ class Entry:
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
 		chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
-		# chrome_options.add_argument("user-data-dir=%s" %os.path.expanduser('~/.config/google-chrome'))
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver
@@ -190,6 +189,7 @@ class Entry:
 	def _retrieve_data(self,selector,value = None):
 		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value) if value else self.driver.find_element_by_css_selector(selector)
 		if not temp:
+			print(False)
 			return False
 		else:
 			return aux_func.clean(temp.encode('utf-8'))
@@ -210,13 +210,12 @@ class Entry:
  		else:
  			try:
 				if loc_ins:
-					eval(loc_ins)
+					exec(loc_ins)
  				driver.get(self._get_url())
 				driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
 				self.pagedata = driver.page_source.encode('utf-8')
 				with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 					f.write(self.pagedata)
-
  			except:
  				self._log("Failed to retrieve url")
  			else:
@@ -229,8 +228,6 @@ class Entry:
 							if price:
  								self.set_price(price)
 								break
-							# else:
-							# 	self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
  							continue
  				except:
@@ -335,8 +332,25 @@ class Entry:
 		return
 
 	def _basspro(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		self.set_undefined()
+		# self._log("Competitor: %d not yet defined" %self.comp_id)
+		# self.set_undefined()
+		# return
+		loc_ins = """
+bpsku = loc_data.basspro(self)
+for p,value in price_dict.iteritems():
+	price_dict[p.format(bpsku)] = price_dict.pop(p)
+for p,value in sale_dict.iteritems():
+	sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
+		price_selectors = {#\
+		"span#listPrice_{}.old_price":"innerHTML","span#offerPrice_{} > span":"innerHTML"}
+		sale_selectors = {"span#offerPrice_{}.price.sale > span":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			self._log("Failed to acqure pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _blain(self):

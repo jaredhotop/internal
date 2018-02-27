@@ -151,11 +151,7 @@ class Entry:
 		return self.comp_id
 
 	def _get_broken(self):
-		if self.broken_flag:
-			print(True)
-		else:
-			print(False)
-		return
+		return True if self.broken_flag else False
 
 	def _get_price(self):
 		return self.comp_price
@@ -189,10 +185,9 @@ class Entry:
 	def _retrieve_data(self,selector,value = None):
 		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value) if value else self.driver.find_element_by_css_selector(selector)
 		if not temp:
-			print(False)
 			return False
 		else:
-			return aux_func.clean(temp.encode('utf-8'))
+			return temp.encode('utf-8')
 
 	def _find_data(self,select,value = 'innerHTML'):
 		try:
@@ -214,8 +209,8 @@ class Entry:
  				driver.get(self._get_url())
 				driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
 				self.pagedata = driver.page_source.encode('utf-8')
-				with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
-					f.write(self.pagedata)
+				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
+				# 	f.write(self.pagedata)
  			except:
  				self._log("Failed to retrieve url")
  			else:
@@ -224,7 +219,7 @@ class Entry:
  				try:
  					for key,value in price_dict.iteritems():
  						try:
-							price = self._retrieve_data(key,value)
+							price = aux_func.clean(self._retrieve_data(key,value))
 							if price:
  								self.set_price(price)
 								break
@@ -238,7 +233,7 @@ class Entry:
 						try:
 							for key,value in sale_dict.iteritems():
 								try:
-									self.set_sale_price(self._retrieve_data(key,value)) if self._retrieve_data(key,value) != self.comp_price else self.set_sale_price(0.00)
+									self.set_sale_price(aux_func.clean(self._retrieve_data(key,value))) if aux_func.clean(self._retrieve_data(key,value)) != self.comp_price else self.set_sale_price(0.00)
 									break
 								except:
 									continue
@@ -262,34 +257,35 @@ class Entry:
 
 	def crawl(self):
 		switch = {
-			1 : self._academy,
-			2 : self._basspro,
-			3 : self._blain,
-			4 : self._farm_and_home,
-			5 : self._home_depot,
-			6 : self._lowes,
-			7 : self._menards,
-			8 : self._tsc,
-			9 : self._walmart,
-			10: self._cabela,
-			11: self._orscheln,
-			12: self._ruralking,
-			13: self._sears,
-			14: self._valleyvet,
-			15: self._lowes,
-			16: self._lowes,
-			17: self._home_depot,
-			23: self._home_depot,
-			24: self._lowes,
-			25: self._farm_and_home,
-			26: self._menards,
-			27: self._menards,
-			36: self._dickeybub,
-			37: self._acehardware,
-			43: self._bootbarn,
-			44: self._shelper,
-			73: self._tsc,
-			74: self._tsc
+			1  : self._academy,
+			2  : self._basspro,
+			3  : self._blain,
+			4  : self._farm_and_home,
+			5  : self._home_depot,
+			6  : self._lowes,
+			7  : self._menards,
+			8  : self._tsc,
+			9  : self._walmart,
+			10 : self._cabela,
+			11 : self._orscheln,
+			12 : self._ruralking,
+			13 : self._sears,
+			14 : self._valleyvet,
+			15 : self._lowes,
+			16 : self._lowes,
+			17 : self._home_depot,
+			23 : self._home_depot,
+			24 : self._lowes,
+			25 : self._farm_and_home,
+			26 : self._menards,
+			27 : self._menards,
+			36 : self._dickeybub,
+			37 : self._acehardware,
+			43 : self._bootbarn,
+			44 : self._shelper,
+			73 : self._tsc,
+			74 : self._tsc,
+			124: self._tsc
 		}
 		switch.get(self.comp_id,self._default)()
 		return
@@ -332,17 +328,14 @@ class Entry:
 		return
 
 	def _basspro(self):
-		# self._log("Competitor: %d not yet defined" %self.comp_id)
-		# self.set_undefined()
-		# return
 		loc_ins = """
 bpsku = loc_data.basspro(self)
 for p,value in price_dict.iteritems():
 	price_dict[p.format(bpsku)] = price_dict.pop(p)
 for p,value in sale_dict.iteritems():
 	sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
-		price_selectors = {#\
-		"span#listPrice_{}.old_price":"innerHTML","span#offerPrice_{} > span":"innerHTML"}
+		price_selectors = {"span#listPrice_{}.old_price":"innerHTML",\
+		"span#offerPrice_{} > span":"innerHTML"}
 		sale_selectors = {"span#offerPrice_{}.price.sale > span":"innerHTML"}
 		broken_link_selectors = {"":""}
 		try:
@@ -481,7 +474,6 @@ for p,value in sale_dict.iteritems():
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()
-			# os.remove(os.path.expanduser('~/.config/google-chrome/Default/Cookies'))
 		return
 
 	def _orscheln(self):
@@ -499,46 +491,24 @@ for p,value in sale_dict.iteritems():
 		return
 
 	def _ruralking(self):
-
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			self.set_price(clean(driver.find_element_by_css_selector("div.price-box > span.regular-price > span.price").get_attribute("text")))
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price using any known css selector")
-		# 		else:
-		# 			try:
-		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
-		# 			except:
-		# 				self._log("No sale price found using current css selectors")
-		# 				self.set_sale_price("0.00")
-		# 			try:
-		# 				check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
-		# 				if check != True:
-		# 					self.set_third_party()
-		# 			except:
-		# 				pass
-		# 			try:
-		# 				#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
-		# 				if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
-		# 					self.set_out_of_stock()
-		# 			except:
-		# 				pass
-		# 	finally:
-		# 		self._kill_driver()
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		self.set_undefined()
+		price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML"}
+		sale_selectors = {"":""}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+		try:
+			time.sleep(5)
+			self.driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
+			if "OUT OF STOCK" in self._retrieve_data("div.product-shop h1[style]","innerHTML"):
+				self.set_out_of_stock()
+		except:
+			pass
+		finally:
+			self._kill_driver()
 		return
+# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
 
 	def _sears(self):
 		price_selectors = {"span.price-wrapper":"innerHTML"}
@@ -577,6 +547,8 @@ for p,value in sale_dict.iteritems():
 			loc_ins = "loc_data.tsc(self,'63701')"
 		elif self.get_comp_id() == 8:
 			loc_ins = "loc_data.tsc(self,'63640')"
+		elif self.get_comp_id() == 124:
+			loc_ins = "loc_data.tsc(self,'63801')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}
 		broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}

@@ -67,12 +67,12 @@ class Entry:
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
 		elif not self.defined:
-			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten.csv'))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
 
 		return
 

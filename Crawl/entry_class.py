@@ -12,15 +12,21 @@ import aux_func
 import loc_data
 import csv
 import shutil
+import os
 #from io import StringIO   #what is this line for?
 import sys
-import os
+sys.path.append( os.path.expanduser("~/Documents"))
+try:
+	from crawlconfig import *
+except:
+	test_mach = 0
 import time
 
 
 class Entry:
 
 	machine_ip = aux_func.get_ip().split(".")
+
 
 	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
@@ -51,6 +57,7 @@ class Entry:
 		self.broken_flag = False
 		self.log_msg = ''
 		self.pagedata = None
+		self.defined = True
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
@@ -60,10 +67,12 @@ class Entry:
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
+		elif not self.defined:
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/unwritten.csv'))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
 
 		return
 
@@ -125,6 +134,10 @@ class Entry:
 		self._log("Corrected unique_id duplicate")
 		return
 
+	def set_undefined(self):
+		self.defined = False
+		return
+
 	def _get_url(self):
 		return str(self.url)
 
@@ -138,11 +151,7 @@ class Entry:
 		return self.comp_id
 
 	def _get_broken(self):
-		if self.broken_flag:
-			print(True)
-		else:
-			print(False)
-		return
+		return True if self.broken_flag else False
 
 	def _get_price(self):
 		return self.comp_price
@@ -152,22 +161,24 @@ class Entry:
 		chrome_options.add_argument("--headless")
 		chrome_options.add_argument("--disable-gpu")
 		chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
-		# chrome_options.add_argument("user-data-dir=%s" %os.path.expanduser('~/.config/google-chrome'))
 		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
 		self._log("Driver created",True)
 		return self.driver
 
 	def _kill_driver(self):
-		self.driver.quit()
-		self._log("Driver destroyed",True)
+		if self.driver:
+			self.driver.quit()
+			self._log("Driver destroyed",True)
+		else:
+			self._log("Error driver doesn't exist")
 		return
 
-	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/"+machine_ip[3]+"self_log.log")):
+	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine"+machine_ip[3]+".log")):
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
-		# if not print_only:
-		# 	with open(file,"a") as f:
-		# 		f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
+		if not print_only and not test_mach:
+			with open(file,"a") as f:
+				f.write("Timestamp: " + now.strftime("%Y-%m-%d %H:%M:%S") + ", comp_id: " +  str(self.comp_id) + ", sku: " + self.sku + ", Log Message: " + log_msg + "\n")
 		print("sku: " + self.sku + " , Log Message: " + log_msg)
 		return
 
@@ -176,7 +187,7 @@ class Entry:
 		if not temp:
 			return False
 		else:
-			return aux_func.clean(temp.encode('utf-8'))
+			return temp.encode('utf-8')
 
 	def _find_data(self,select,value = 'innerHTML'):
 		try:
@@ -189,19 +200,18 @@ class Entry:
 		try:
 			driver = self._create_driver()
  		except:
+			self.driver = None
  			self._log("Driver failed to start")
  		else:
  			try:
 				if loc_ins:
-					eval(loc_ins)
+					exec(loc_ins)
  				driver.get(self._get_url())
 				driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
 				self.pagedata = driver.page_source.encode('utf-8')
-				with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
-					f.write(self.pagedata)
-
+				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
+				# 	f.write(self.pagedata)
  			except:
-				raise
  				self._log("Failed to retrieve url")
  			else:
  #Find Price
@@ -209,17 +219,13 @@ class Entry:
  				try:
  					for key,value in price_dict.iteritems():
  						try:
-							price = self._retrieve_data(key,value)
+							price = aux_func.clean(self._retrieve_data(key,value))
 							if price:
  								self.set_price(price)
 								break
-							# else:
-							# 	self._log("Retrieve_data return false. Check your selector and attribute values")
  						except:
-							raise
  							continue
  				except:
-					raise
  					self._log("Failed to retrieve competitor price")
  #Find Sale Price
  				else:
@@ -227,7 +233,7 @@ class Entry:
 						try:
 							for key,value in sale_dict.iteritems():
 								try:
-									self.set_sale_price(self._retrieve_data(key,value)) if self._retrieve_data(key,value) != self.comp_price else self.set_sale_price(0.00)
+									self.set_sale_price(aux_func.clean(self._retrieve_data(key,value))) if aux_func.clean(self._retrieve_data(key,value)) != self.comp_price else self.set_sale_price(0.00)
 									break
 								except:
 									continue
@@ -251,34 +257,35 @@ class Entry:
 
 	def crawl(self):
 		switch = {
-			1 : self._academy,
-			2 : self._basspro,
-			3 : self._blain,
-			4 : self._farm_and_home,
-			5 : self._home_depot,
-			6 : self._lowes,
-			7 : self._menards,
-			8 : self._tsc,
-			9 : self._walmart,
-			10: self._cabela,
-			11: self._orscheln,
-			12: self._ruralking,
-			13: self._sears,
-			14: self._valleyvet,
-			15: self._lowes,
-			16: self._lowes,
-			17: self._home_depot,
-			23: self._home_depot,
-			24: self._lowes,
-			25: self._farm_and_home,
-			26: self._menards,
-			27: self._menards,
-			36: self._dickeybub,
-			37: self._acehardware,
-			43: self._bootbarn,
-			44: self._shelper,
-			73: self._tsc,
-			74: self._tsc
+			1  : self._academy,
+			2  : self._basspro,
+			3  : self._blain,
+			4  : self._farm_and_home,
+			5  : self._home_depot,
+			6  : self._lowes,
+			7  : self._menards,
+			8  : self._tsc,
+			9  : self._walmart,
+			10 : self._cabela,
+			11 : self._orscheln,
+			12 : self._ruralking,
+			13 : self._sears,
+			14 : self._valleyvet,
+			15 : self._lowes,
+			16 : self._lowes,
+			17 : self._home_depot,
+			23 : self._home_depot,
+			24 : self._lowes,
+			25 : self._farm_and_home,
+			26 : self._menards,
+			27 : self._menards,
+			36 : self._dickeybub,
+			37 : self._acehardware,
+			43 : self._bootbarn,
+			44 : self._shelper,
+			73 : self._tsc,
+			74 : self._tsc,
+			124: self._tsc
 		}
 		switch.get(self.comp_id,self._default)()
 		return
@@ -321,7 +328,22 @@ class Entry:
 		return
 
 	def _basspro(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		loc_ins = """
+bpsku = loc_data.basspro(self)
+for p,value in price_dict.iteritems():
+	price_dict[p.format(bpsku)] = price_dict.pop(p)
+for p,value in sale_dict.iteritems():
+	sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
+		price_selectors = {"span#listPrice_{}.old_price":"innerHTML",\
+		"span#offerPrice_{} > span":"innerHTML"}
+		sale_selectors = {"span#offerPrice_{}.price.sale > span":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+		except:
+			self._log("Failed to acqure pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _blain(self):
@@ -345,8 +367,6 @@ class Entry:
 		return
 
 	def _bootbarn(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		return
 		price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
 		"h6.product-callout-title > strong":"innerHTML"}
 		sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
@@ -362,7 +382,16 @@ class Entry:
 		return
 
 	def _cabela(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
+		price_selectors = {"dd.regularnprange":"innerHTML",\
+		"div.price > dl > dd.nprange":"innerHTML"}
+		sale_selectors = {"dd.saleprice":"innerHTML"}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+		finally:
+			self._kill_driver()
 		return
 
 	def _dickeybub(self):
@@ -379,6 +408,7 @@ class Entry:
 
 	def _home_depot(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 		if self.get_comp_id() == 23:
 			loc_ins = ""
@@ -400,6 +430,7 @@ class Entry:
 
 	def _farm_and_home(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _lowes(self):
@@ -418,7 +449,6 @@ class Entry:
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
-			raise
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()
@@ -444,7 +474,6 @@ class Entry:
 			self._log("Failed to acquire pricing data")
 		finally:
 			self._kill_driver()
-			# os.remove(os.path.expanduser('~/.config/google-chrome/Default/Cookies'))
 		return
 
 	def _orscheln(self):
@@ -462,43 +491,24 @@ class Entry:
 		return
 
 	def _ruralking(self):
-		# try:
-		# 	driver = self._create_driver()
-		# except:
-		# 	self._log("Driver failed to start")
-		# else:
-		# 	try:
-		# 		driver.get(self._get_url())
-		# 		self.pagedata = driver.page_source.encode('utf-8')
-		# 	except:
-		# 		self._log("Failed to retrieve url")
-		# 	else:
-		# 		self.set_shop_date()
-		# 		try:
-		# 			self.set_price(clean(driver.find_element_by_css_selector("div.price-box > span.regular-price > span.price").get_attribute("text")))
-		# 		except:
-		# 			self._log("Failed to retrieve competitor price using any known css selector")
-		# 		else:
-		# 			try:
-		# 				self.set_sale_price(clean(driver.find_element_by_css_selector("div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
-		# 			except:
-		# 				self._log("No sale price found using current css selectors")
-		# 				self.set_sale_price("0.00")
-		# 			try:
-		# 				check = EC.presence_of_element_located((By.CSS_SELECTOR, "a.font-bold.prod-SoldShipByMsg[href=http://help.walmart.com]"))
-		# 				if check != True:
-		# 					self.set_third_party()
-		# 			except:
-		# 				pass
-		# 			try:
-		# 				#https://www.walmart.com/ip/Holiday-Time-Net-Light-Set-Green-Wire-Blue-Bulbs-150-Count/21288309   //Out of stock link
-		# 				if (EC.presence_of_element_located(BY.CSS_SELECTOR,"span.copy-mini.display-block-xs.font-bold.u-textBlack[text=Out of stock]")):
-		# 					self.set_out_of_stock()
-		# 			except:
-		# 				pass
-		# 	finally:
-		# 		self._kill_driver()
+		price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML"}
+		sale_selectors = {"":""}
+		broken_link_selectors = {"":""}
+		try:
+			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
+		except:
+			self._log("Failed to acquire pricing data")
+		try:
+			time.sleep(5)
+			self.driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
+			if "OUT OF STOCK" in self._retrieve_data("div.product-shop h1[style]","innerHTML"):
+				self.set_out_of_stock()
+		except:
+			pass
+		finally:
+			self._kill_driver()
 		return
+# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
 
 	def _sears(self):
 		price_selectors = {"span.price-wrapper":"innerHTML"}
@@ -507,7 +517,6 @@ class Entry:
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
-			raise
 			self._log("Failed to acquire pricing data")
 #No Third Party
 #No out of Stock
@@ -538,6 +547,8 @@ class Entry:
 			loc_ins = "loc_data.tsc(self,'63701')"
 		elif self.get_comp_id() == 8:
 			loc_ins = "loc_data.tsc(self,'63640')"
+		elif self.get_comp_id() == 124:
+			loc_ins = "loc_data.tsc(self,'63801')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}
 		broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}
@@ -553,6 +564,7 @@ class Entry:
 
 	def _valleyvet(self):
 		self._log("Competitor: %d not yet defined" %self.comp_id)
+		self.set_undefined()
 		return
 
 	def _walmart(self):
@@ -596,4 +608,5 @@ class Entry:
 
 	def _default(self):
 		self._log("Unknown Competitor ID")
+		self.set_undefined()
 		return

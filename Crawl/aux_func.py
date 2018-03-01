@@ -20,4 +20,5 @@ def clean(string):
 	string = non_decimal.sub('', string)
 	string = string.strip()
 	string = string.replace("$","")
-	return float(string)
+	string = string.split('-')
+	return float(string[0])

@@ -1,4 +1,6 @@
-#import crawl_class
+# Competitor pricing crawler v1.0
+# written by: Jayson Scruggs
+# Property of Buchheit
 import set_loc
 import entry_class
 import aux_func
@@ -6,7 +8,7 @@ import os
 import csv
 
 ip = aux_func.get_ip().split(".")
-file_name = os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/testrun"+ip[3]+".csv")
+file_name = os.path.expanduser("/media/WebCrawl/inputs/tsclinks"+ip[3]+".csv")
 search_arr = written_arr = []
 with open(file_name,"r" )as f:
 	r = csv.reader(f,delimiter = ",")
@@ -19,7 +21,8 @@ for obj in search_arr:
 		if obj.get_unique_id == entry.get_unique_id:
 			obj.set_unique_id
 	obj.crawl()
-	obj.write_entry(os.path.expanduser("/media/p/IT/Data Warehosuse/Price Change Reports/Buyer Runs/test_out"+ip[3]+".csv"))
+	obj.write_entry(os.path.expanduser("~/Documents/test_out"+ip[3]+".csv"))
 	written_arr.append(obj)
 	search_arr.pop()
+os.rename(os.path.expanduser("~/Documents/test_out"+ip[3]+".csv"),os.path.expanduser("/media/WebCrawl/outputs/test_out"+ip[3]+".csv"))
 print("done")

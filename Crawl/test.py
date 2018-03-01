@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import entry_class
 
+
 obj = entry_class.Entry('3','1234','4665',False,False,'1',\
 'https://www.farmandfleet.com/products/g-9127-work-n-sport-mens-plaid-short-sleeve-button-down-shirt.html')
 obj.crawl()

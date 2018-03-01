@@ -202,19 +202,19 @@ class Entry:
  		except:
 			self.driver = None
  			self._log("Driver failed to start")
+			raise
  		else:
  			try:
 				if loc_ins:
 					exec(loc_ins)
  				driver.get(self._get_url())
-				driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
 				self.pagedata = driver.page_source.encode('utf-8')
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)
  			except:
  				self._log("Failed to retrieve url")
  			else:
- #Find Price
+				#Find Price
  				self.set_shop_date()
  				try:
  					for key,value in price_dict.iteritems():
@@ -227,7 +227,7 @@ class Entry:
  							continue
  				except:
  					self._log("Failed to retrieve competitor price")
- #Find Sale Price
+ 				#Find Sale Price
  				else:
 					if sale_dict:
 						try:

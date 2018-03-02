@@ -94,7 +94,7 @@ class Entry:
 		self.create_date, self.created_by_tm, self.last_update_date, self.link_id, \
 		self.sku, self.shop_date, self.updated_by_tm, self.reviewed, self.reviewed_by, \
 		self.reviewed_date, self.comp_shop_manual, self.comp_shop_promo, \
-		self.comp_match_id,self.comp_shop_out_of_stock, self.comp_shop_third_party)
+		self.comp_match_id,self.comp_shop_out_of_stock, self.comp_shop_third_party,machine_ip[3])
 
 	def set_price(self,price):
 		if isinstance(price, (int, long, float)):

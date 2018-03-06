@@ -25,10 +25,10 @@ import time
 
 class Entry:
 
-	machine_ip = aux_func.get_ip().split(".")
+	# machine_ip = aux_func.get_ip().split(".")
 
 
-	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url):
+	def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url,ip):
 		future_date = datetime(3000, 12, 31, 1, 0, 0)
 		now = datetime.now()
 		self.unique_id = now.strftime("%Y%m%d")+comp_id+sku
@@ -58,6 +58,7 @@ class Entry:
 		self.log_msg = ''
 		self.pagedata = None
 		self.defined = True
+		self.ip =ip
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
@@ -67,12 +68,12 @@ class Entry:
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 		elif not self.defined:
-			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten'+machine_ip[3]+'.csv'))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 
 		return
 
@@ -156,6 +157,9 @@ class Entry:
 	def _get_price(self):
 		return self.comp_price
 
+	def _get_ip(self):
+		return self.ip
+
 	def _create_driver(self):
 		chrome_options = Options()
 		chrome_options.add_argument("--headless")
@@ -173,7 +177,8 @@ class Entry:
 			self._log("Error driver doesn't exist")
 		return
 
-	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine"+machine_ip[3]+".log")):
+	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine{}.log")):
+		file = file.format(self._get_ip())
 		self.log_msg = self.log_msg + " \n" + log_msg
 		now = datetime.now()
 		if not print_only and not test_mach:

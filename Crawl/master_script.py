@@ -1,7 +1,7 @@
 import os
 import csv
 
-os.remove("/media/WebCrawl/unwritten_master.csv")
+
 
 for file in os.listdir("/media/WebCrawl"):
     if file.endswith(".csv"):

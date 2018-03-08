@@ -23,16 +23,16 @@ try:
             if obj.get_unique_id == entry.get_unique_id:
                 obj.set_unique_id
         obj.crawl()
-        obj.write_entry(os.path.expanduser("~/Documents/test_out%s.csv" %ip[3]))
+        obj.write_entry(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]))
         written_arr.append(obj)
         search_arr.pop()
-    os.rename(os.path.expanduser("~/Documents/test_out%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/test_out%s.csv" %ip[3]))
+    os.rename(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
 except:
     if email_crash_report:
         server = smtplib.SMTP('smtp.gmail.com',587)
         server.starttls()
         server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
-        msg ="Script Failed on Clone%s " %ip[3]
+        msg ="Script Failed on Clone %s " %ip[3]
         server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg)
         server.quit()
     else:

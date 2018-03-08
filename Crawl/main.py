@@ -7,6 +7,14 @@ import aux_func
 import os
 import csv
 import smtplib
+import sys
+sys.path.append( os.path.expanduser("~/Documents"))
+try:
+	from crawlconfig import *
+except:
+	test_mach = 0
+	email_crash_report = 1
+import time
 
 try:
     ip = aux_func.get_ip().split(".")
@@ -17,15 +25,15 @@ try:
         for row in r:
             temp = entry_class.Entry(row[0],row[1],row[2],row[3],row[4],row[5],row[6],ip[3])
             search_arr.append(temp)
-    #set_cookies()
     for obj in search_arr:
         for entry in written_arr:
-            if obj.get_unique_id == entry.get_unique_id:
+            if obj.get_unique_id == entry:
                 obj.set_unique_id
         obj.crawl()
         obj.write_entry(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]))
-        written_arr.append(obj)
+        written_arr.append(obj.unique_id)
         search_arr.pop()
+    os.rename(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten_%s.csv" %ip[3]))
     os.rename(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
 except:
     if email_crash_report:

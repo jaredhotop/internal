@@ -6,10 +6,14 @@ from selenium.webdriver.common.by import By
 import entry_class
 
 
-obj = entry_class.Entry('3','1234','4665',False,False,'1',\
-'https://www.farmandfleet.com/products/g-9127-work-n-sport-mens-plaid-short-sleeve-button-down-shirt.html')
+
+obj = entry_class.Entry('5','1234','4665',False,False,'1',\
+'https://www.homedepot.com/p/Unbranded-50-lbs-Rock-Salt-Bag-4664/202523041','90')
 obj.crawl()
-obj._print_readable()
+# obj = entry_class.Entry('5','1234','4665',False,False,'1',\
+# 'https://www.homedepot.com/p/Safe-Step-40-lb-5300-Max-Blend-Ice-Melter-57840/202564240','90')
+# obj.crawl()
+print(obj)
 # url = 'https://www.orschelnfarmhome.com/view/product/si-waterproof-steel-toe-knee-work-boots-14-in/si5855988'
 # chrome_options = Options()
 # # chrome_options.add_argument("--headless")

@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 import aux_func
 import loc_data
 import csv
@@ -76,12 +77,12 @@ class Entry:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
 		elif not self.defined:
-			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
 		return
 
 
@@ -184,8 +185,9 @@ class Entry:
 		return
 
 	def _retrieve_data(self,selector,value = None):
-		temp = self.driver.find_element_by_css_selector(selector).get_attribute(value) if value else self.driver.find_element_by_css_selector(selector)
-		if not temp:
+		try:
+			temp = self.driver.find_element_by_css_selector(selector).get_attribute(value) if value else self.driver.find_element_by_css_selector(selector)
+		except:
 			return False
 		else:
 			return temp.encode('utf-8')
@@ -413,23 +415,25 @@ for p,value in sale_dict.iteritems():
 		return
 
 	def _home_depot(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		self.set_undefined()
-		return
 		if self.get_comp_id() == 23:
-			loc_ins = ""
+			loc_ins = "loc_data.home_depot(self,62226)"
 		elif self.get_comp_id() == 5:
-			loc_ins = ""
+			loc_ins = "loc_data.home_depot(self,63028)"
 		elif self.get_comp_id() == 17:
-			loc_ins = ""
-		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML",\
-		"span#ajaxPrice":"content"}
+			loc_ins = "loc_data.home_depot(self,62650)"
+		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
 		sale_selectors = {"span#ajaxPrice":"content"}
 		broken_link_selectors = {"":""}
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
 			self._log("Failed to acquire pricing data")
+		try:
+			WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
+			if self._retrieve_data("span.quantity","innerHTML"):
+				self.set_out_of_stock()
+		except:
+			self._log("Out of stock check failed")
 		finally:
 			self._kill_driver()
 		return

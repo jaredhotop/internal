@@ -47,6 +47,7 @@ def home_depot(obj,store):
     WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "a.bttn-outline[data-storeid]")))
     driver.find_element_by_css_selector("a.bttn-outline[data-storeid]").click()
     WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "span.sfmystoreicon")))
+    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
     return driver
 
 def basspro(obj):

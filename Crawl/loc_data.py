@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import entry_class
-import time
+from datetime import datetime
 
 def menards(obj,store):
     driver = obj.get_driver()
@@ -19,10 +19,9 @@ def tsc(obj,store):
     driver = obj.get_driver()
     driver.get("https://www.tractorsupply.com/tsc/store-locator?zipCode=%s" %store)
     driver.find_element_by_css_selector("span.makemystore_link_sl_sr.underlinehover").click()
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.dijitDialogPaneContent[data-dojo-attach-point=containerNode] button#str_mms_yes")))
+    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.dijitDialogPaneContent[data-dojo-attach-point=containerNode] button#str_mms_yes")))
     driver.find_element_by_css_selector("div.dijitDialogPaneContent[data-dojo-attach-point=containerNode] button#str_mms_yes").click()
-    time.sleep(5)
-    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s%s.png" %obj.sku %datetime.now()))
+    driver.get(obj.url)
     return driver
 
 def lowes(obj,store):

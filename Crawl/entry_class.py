@@ -20,6 +20,7 @@ try:
 	from crawlconfig import *
 except:
 	test_mach = 0
+	email_crash_report = 1
 import time
 
 
@@ -67,14 +68,12 @@ class Entry:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
 		elif self.broken_flag:
-			self._log("Entry not valid. Writing to alternate file.")
 			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 		elif not self.defined:
 			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
 			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
-
 		return
 
 	def _print_readable(self):
@@ -95,7 +94,7 @@ class Entry:
 		self.create_date, self.created_by_tm, self.last_update_date, self.link_id, \
 		self.sku, self.shop_date, self.updated_by_tm, self.reviewed, self.reviewed_by, \
 		self.reviewed_date, self.comp_shop_manual, self.comp_shop_promo, \
-		self.comp_match_id,self.comp_shop_out_of_stock, self.comp_shop_third_party,machine_ip[3])
+		self.comp_match_id,self.comp_shop_out_of_stock, self.comp_shop_third_party,self.ip)
 
 	def set_price(self,price):
 		if isinstance(price, (int, long, float)):
@@ -207,11 +206,16 @@ class Entry:
  		except:
 			self.driver = None
  			self._log("Driver failed to start")
-			raise
  		else:
  			try:
 				if loc_ins:
-					exec(loc_ins)
+					for x in range(5):
+						try:
+							exec(loc_ins)
+						except:
+							continue
+						else:
+							break
  				driver.get(self._get_url())
 				self.pagedata = driver.page_source.encode('utf-8')
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
@@ -305,8 +309,8 @@ class Entry:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
-#No third party
-#check out of stock
+		#No third party
+		#check out of stock
 		try:
 			try:
 				oos = self.driver.find_element_by_css_selector("button#add2CartBtn").get_attribute("innerHTML")
@@ -326,8 +330,8 @@ class Entry:
 			self.pricing(price_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
-#No third party
-#No out of stock
+		#No third party
+		#No out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -361,7 +365,7 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
-#No third party
+		#No third party
 		try:
 			if not self._find_data("span.stock-msg.in-stock"):
 				self.set_out_of_stock()
@@ -380,8 +384,8 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
-#no third Party
-#no out of stock
+		#no third Party
+		#no out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -489,8 +493,8 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
-#No third party
-#No out of stock
+		#No third party
+		#No out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -513,7 +517,7 @@ for p,value in sale_dict.iteritems():
 		finally:
 			self._kill_driver()
 		return
-# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
+		# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
 
 	def _sears(self):
 		price_selectors = {"span.price-wrapper":"innerHTML"}
@@ -523,8 +527,8 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
-#No Third Party
-#No out of Stock
+		#No Third Party
+		#No out of Stock
 		finally:
 			self._kill_driver()
 		return
@@ -537,8 +541,8 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors)
 		except:
 			self._log("Failed to acquire pricing data")
-#No third party
-#No out of stock
+			#No third party
+			#No out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -561,8 +565,8 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
 			self._log("Failed to acquire pricing data")
-#no third party
-#no out of stock
+			#no third party
+			#no out of stock
 		finally:
 			self._kill_driver()
 		return
@@ -584,7 +588,7 @@ for p,value in sale_dict.iteritems():
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
 		except:
 			self._log("Failed to aquire pricing data")
-#check for Third party
+		#check for Third party
 		try:
 			if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
 					sellers = self.driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
@@ -597,7 +601,7 @@ for p,value in sale_dict.iteritems():
 
 		except:
 			self._log("Third party check failed")
-#check Out of stock
+		#check Out of stock
 		try:
 			try:
 				oos = self.driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")

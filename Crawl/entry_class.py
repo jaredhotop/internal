@@ -61,6 +61,14 @@ class Entry:
 		self.defined = True
 		self.ip =ip
 
+	def __repr__(self):
+		return "Entry('{}','{}','{}','{}','{}','{}','{}','{}')".format(self.comp_id, self.link_id,\
+		self.sku, self.comp_shop_manual, self.comp_shop_promo, self.comp_match_id, self.url, self.ip)
+
+	def __str__(self):
+		return "**********\nSku: {}\nPrice: {}\nSale Price: {}\nThird Party: {}\nOut of Stock: {}\nUrl: {}\n**********".format(\
+		self.sku, self.comp_price, self.comp_sale_price, self.comp_shop_third_party, self.comp_shop_out_of_stock, self.url)
+
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
 			self._log("Writing entry to file: " + file,True)
@@ -76,17 +84,6 @@ class Entry:
 			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('/media/WebCrawl/unwritten%s.csv' %self._get_ip()))
 		return
 
-	def _print_readable(self):
-		variables = ("unique_id", "comp_id", "comp_match", "comp_price", \
-		"comp_sale_price", "comp_shop_leader", "comp_shop_notes", \
-		"create_date", "created_by_tm", "last_update_date", "link_id", \
-		"sku", "shop_date", "updated_by_tm", "reviewed", "reviewed_by", \
-		"reviewed_date", "comp_shop_manual", "comp_shop_promo", \
-		"comp_match_id","comp_shop_out_of_stock", "comp_shop_third_party")
-		values = self._data_tup()
-		for i in range(len(variables)):
-			print(variables[i],values[i])
-		return
 
 	def _data_tup(self):
 		return (self.unique_id, self.comp_id, self.comp_match, self.comp_price,  \

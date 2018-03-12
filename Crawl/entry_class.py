@@ -191,7 +191,7 @@ class Entry:
  		except:
 			self.driver = None
  			self._log("Driver failed to start")
-			raise
+
  		else:
  			try:
 				if loc_ins:
@@ -199,7 +199,7 @@ class Entry:
 						try:
 							exec(loc_ins)
 						except:
-							raise
+
 							continue
 						else:
 							break
@@ -208,7 +208,7 @@ class Entry:
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)
  			except:
-				raise
+
  				self._log("Failed to retrieve url")
  			else:
 				#Find Price

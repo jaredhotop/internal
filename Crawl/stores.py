@@ -133,15 +133,14 @@ def _home_depot(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		raise
+
 		obj._log("Failed to acquire pricing data")
 	try:
 		WebDriverWait(obj.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
 		if '0' in obj._retrieve_data("span.quantity","innerHTML"):
 			obj.set_out_of_stock()
 	except:
-            raise
-            obj._log("Out of stock check failed")
+         obj._log("Out of stock check failed")
 	finally:
 		obj._kill_driver()
 	return

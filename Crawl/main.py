@@ -2,7 +2,7 @@
 # written by: Jayson Scruggs
 # Property of Buchheit
 import set_loc
-import entry_class_logger
+import entry_class
 import aux_func
 import os
 import csv
@@ -36,6 +36,7 @@ try:
 		written_arr.append(obj.unique_id)
 		search_arr = search_arr[1:]
 		print(obj)
+		del obj
 		print("search: ", len(search_arr))
 		print("written: ", len(written_arr))
     os.rename(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten_%s.csv" %ip[3]))

@@ -67,8 +67,8 @@ class Entry:
 		self.sku, self.comp_shop_manual, self.comp_shop_promo, self.comp_match_id, self.url, self.ip)
 
 	def __str__(self):
-		return "**********\nSku: {}\nPrice: {}\nSale Price: {}\nThird Party: {}\nOut of Stock: {}\nUrl: {}\n**********".format(\
-		self.sku, self.comp_price, self.comp_sale_price, self.comp_shop_third_party, self.comp_shop_out_of_stock, self.url)
+		return "**********\nSku: {}\nPrice: {}\nSale Price: {}\nThird Party: {}\nOut of Stock: {}\nComp_id: {}\nUrl: {}\n**********".format(\
+		self.sku, self.comp_price, self.comp_sale_price, self.comp_shop_third_party, self.comp_shop_out_of_stock,self.comp_id, self.url)
 
 	def write_entry(self, file):
 		if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):

@@ -6,42 +6,42 @@ from selenium.webdriver.support.ui import WebDriverWait
 import loc_data
 
 
-def _academy(obj):
+def academy(obj):
 	price_selectors = {"input#dlItemPrice":"value",}
 	sale_selectors = {"span#currentPrice":"innerHTML",}
 	broken_link_selectors = {"p#search_results_total_count":"innerHTML"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to aquire pricing data")
+		obj.log("Failed to aquire pricing data")
 	#No third party
 	#check out of stock
 	try:
 		try:
-			oos = obj.driver.find_element_by_css_selector("button#add2CartBtn").get_attribute("innerHTML")
+			oos = obj._driver.find_element_by_css_selector("button#add2CartBtn").get_attribute("innerHTML")
 		except:
 			oos = "in stock"
 		if "Out of Stock" in oos:
 			obj.set_out_of_stock()
 	except:
-		obj._log("Out of stock check failed")
+		obj.log("Out of stock check failed")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _acehardware(obj):
+def acehardware(obj):
 	price_selectors = {"div.productPrice span script":"innerHTML",}
 	try:
 		obj.pricing(price_selectors)
 	except:
-		obj._log("Failed to aquire pricing data")
+		obj.log("Failed to aquire pricing data")
 	#No third party
 	#No out of stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _basspro(obj):
+def basspro(obj):
 	loc_ins = """
 bpsku = loc_data.basspro(obj)
 for p,value in price_dict.iteritems():
@@ -55,12 +55,12 @@ sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		obj._log("Failed to acqure pricing data")
+		obj.log("Failed to acqure pricing data")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _blain(obj):
+def blain(obj):
 	price_selectors = {"meta[itemprop=lowprice]":"content",\
 	"div.active-price>div.price>span":"innerHTML",\
 	"div.original-price>span.price>span":"innerHTML"}
@@ -69,18 +69,18 @@ def _blain(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	#No third party
 	try:
 		if not obj._find_data("span.stock-msg.in-stock"):
 			obj.set_out_of_stock()
 	except:
-		obj._log("Out of stock check failed")
+		obj.log("Out of stock check failed")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _bootbarn(obj):
+def bootbarn(obj):
 	price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
 	"h6.product-callout-title > strong":"innerHTML"}
 	sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
@@ -88,14 +88,14 @@ def _bootbarn(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to aquire pricing data")
+		obj.log("Failed to aquire pricing data")
 	#no third Party
 	#no out of stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _cabela(obj):
+def cabela(obj):
 	price_selectors = {"dd.regularnprange":"innerHTML",\
 	"div.price > dl > dd.nprange":"innerHTML"}
 	sale_selectors = {"dd.saleprice":"innerHTML"}
@@ -103,24 +103,24 @@ def _cabela(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _dickeybub(obj):
+def dickeybub(obj):
 	price_selectors = {"p.price > del > span.woocommerce-Price-amount.amount" : "innerHTML",\
 	"p.price > span.woocommerce-Price-amount.amount" : "innerHTML",}
 	sale_selectors = {"p.price > ins > span.woocommerce-Price-amount.amount" : "innerHTML",}
 	try:
 		obj.pricing(price_selectors,sale_selectors,)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _home_depot(obj):
+def home_depot(obj):
 	if obj.comp_id == 23:
 		loc_ins = "loc_data.home_depot(self,62226)"
 	elif obj.comp_id == 5:
@@ -134,23 +134,24 @@ def _home_depot(obj):
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
 
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	try:
-		WebDriverWait(obj.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
+		WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
 		if '0' in obj._retrieve_data("span.quantity","innerHTML"):
 			obj.set_out_of_stock()
 	except:
-         obj._log("Out of stock check failed")
+         raise
+         obj.log("Out of stock check failed")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _farm_and_home(obj):
-	obj._log("Competitor: %d not yet defined" %obj.comp_id)
+def farm_and_home(obj):
+	obj.log("Competitor: %d not yet defined" %obj.comp_id)
 	obj.set_undefined()
 	return
 
-def _lowes(obj):
+def lowes(obj):
 	if obj.comp_id == 6:
 		loc_ins = "loc_data.lowes(self,63028)"
 	elif obj.comp_id == 15:
@@ -166,12 +167,12 @@ def _lowes(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _menards(obj):
+def menards(obj):
 	if obj.comp_id == 7:
 		loc_ins = "loc_data.menards(self,'3286')"
 	elif obj.comp_id == 26:
@@ -188,74 +189,74 @@ def _menards(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _orscheln(obj):
+def orscheln(obj):
 	price_selectors = {"span.product_unit_price" : "innerHTML",}
 	sale_selectors = {"":""}
 	broken_link_selectors = {"":""}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	#No third party
 	#No out of stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _ruralking(obj):
+def ruralking(obj):
 	price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML"}
 	sale_selectors = {"":""}
 	broken_link_selectors = {"":""}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	try:
 		time.sleep(5)
-		obj.driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
+		obj._driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
 		if "OUT OF STOCK" in obj._retrieve_data("div.product-shop h1[style]","innerHTML"):
 			obj.set_out_of_stock()
 	except:
 		pass
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 	# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
 
-def _sears(obj):
+def sears(obj):
 	price_selectors = {"span.price-wrapper":"innerHTML"}
 	sale_selectors = {"h4.redSalePrice span.price-wrapper":"innerHTML"}
 	broken_link_selectors = {"":""}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 	#No Third Party
 	#No out of Stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _shelper(obj):
+def shelper(obj):
 	price_selectors = {"div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong" : "innerHTML",}
 	sale_selectors = {"div.product-content-inner > div.product-callout > h6.product-callout-title > strong" : "innerHTML",}
 	broken_link_selectors = {"":""}
 	try:
 		obj.pricing(price_selectors,sale_selectors)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 		#No third party
 		#No out of stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _tsc(obj):
+def tsc(obj):
 	#view in cart item
 	# https://www.tractorsupply.com/tsc/product/jonsered-502cc-gas-chainsaw-cs2250s?cm_vc=-10005
 	if obj.comp_id == 73:
@@ -272,19 +273,19 @@ def _tsc(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		obj._log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
 		#no third party
 		#no out of stock
 	finally:
-		obj._kill_driver()
+		obj.kill_driver()
 	return
 
-def _valleyvet(obj):
-	obj._log("Competitor: %d not yet defined" %obj.comp_id)
+def valleyvet(obj):
+	obj.log("Competitor: %d not yet defined" %obj.comp_id)
 	obj.set_undefined()
 	return
 
-def _walmart(obj):
+def walmart(obj):
 	price_selectors = {"div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group" : "title",\
 	"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
 	"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
@@ -295,11 +296,11 @@ def _walmart(obj):
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
-		obj._log("Failed to aquire pricing data")
+		obj.log("Failed to aquire pricing data")
 	#check for Third party
 	try:
 		if obj._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
-				sellers = obj.driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+				sellers = obj._driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
 				for sell in sellers:
 					if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
 						obj.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
@@ -308,22 +309,22 @@ def _walmart(obj):
 			obj.set_third_party()
 
 	except:
-		obj._log("Third party check failed")
+		obj.log("Third party check failed")
 	#check Out of stock
 	try:
 		try:
-			oos = obj.driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")
+			oos = obj._driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")
 		except:
 			oos = "in stock"
 		if "Out of stock" in oos:
 			obj.set_out_of_stock()
 	except:
-		obj._log("Out of stock check failed")
+		obj.log("Out of stock check failed")
 	finally:
-			obj._kill_driver()
+			obj.kill_driver()
 	return
 
 def _default(obj):
-	obj._log("Unknown Competitor ID")
+	obj.log("Unknown Competitor ID")
 	obj.set_undefined()
 	return

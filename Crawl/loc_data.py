@@ -9,14 +9,14 @@ import entry_class
 from datetime import datetime
 
 def menards(obj,store):
-    driver = obj.driver
+    driver = obj._driver
     driver.get("https://www.menards.com/main/storeDetails.html?store=%s&setMyStore=true/" %store)
     driver.find_element_by_link_text("Make My Store").click()
     # driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
     return driver
 
 def tsc(obj,store):
-    driver = obj.driver
+    driver = obj._driver
     driver.get("https://www.tractorsupply.com/tsc/store-locator?zipCode=%s" %store)
     driver.find_element_by_css_selector("span.makemystore_link_sl_sr.underlinehover").click()
     WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.dijitDialogPaneContent[data-dojo-attach-point=containerNode] button#str_mms_yes")))
@@ -25,7 +25,7 @@ def tsc(obj,store):
     return driver
 
 def lowes(obj,store):
-    driver = obj.driver
+    driver = obj._driver
     driver.get("https://www.lowes.com/")
     try:
         driver.find_elements_by_class_name("close")[1].click()
@@ -40,7 +40,7 @@ def lowes(obj,store):
     return driver
 
 def home_depot(obj,store):
-    driver = obj.driver
+    driver = obj._driver
     driver.get("https://www.homedepot.com/l/search/")
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "storeSearchBox")))
     driver.find_element_by_id("storeSearchBox").send_keys(store,Keys.ENTER)
@@ -51,7 +51,7 @@ def home_depot(obj,store):
     return driver
 
 def basspro(obj):
-    driver = obj.driver
+    driver = obj._driver
     driver.get(obj.url)
     driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
     bpsku = obj._retrieve_data("meta[name=pageId]","content")

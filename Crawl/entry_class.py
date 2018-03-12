@@ -14,6 +14,7 @@ import loc_data
 import csv
 import shutil
 import os
+import stores
 #from io import StringIO   #what is this line for?
 import sys
 sys.path.append( os.path.expanduser("~/Documents"))
@@ -198,6 +199,7 @@ class Entry:
 						try:
 							exec(loc_ins)
 						except:
+							raise
 							continue
 						else:
 							break
@@ -206,6 +208,7 @@ class Entry:
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)
  			except:
+				raise
  				self._log("Failed to retrieve url")
  			else:
 				#Find Price
@@ -251,359 +254,37 @@ class Entry:
 
 	def crawl(self):
 		switch = {
-			1  : self._academy,
-			2  : self._basspro,
-			3  : self._blain,
-			4  : self._farm_and_home,
-			5  : self._home_depot,
-			6  : self._lowes,
-			7  : self._menards,
-			8  : self._tsc,
-			9  : self._walmart,
-			10 : self._cabela,
-			11 : self._orscheln,
-			12 : self._ruralking,
-			13 : self._sears,
-			14 : self._valleyvet,
-			15 : self._lowes,
-			16 : self._lowes,
-			17 : self._home_depot,
-			23 : self._home_depot,
-			24 : self._lowes,
-			25 : self._farm_and_home,
-			26 : self._menards,
-			27 : self._menards,
-			36 : self._dickeybub,
-			37 : self._acehardware,
-			43 : self._bootbarn,
-			44 : self._shelper,
-			73 : self._tsc,
-			74 : self._tsc,
-			124: self._tsc
+			1  : stores._academy,
+			2  : stores._basspro,
+			3  : stores._blain,
+			4  : stores._farm_and_home,
+			5  : stores._home_depot,
+			6  : stores._lowes,
+			7  : stores._menards,
+			8  : stores._tsc,
+			9  : stores._walmart,
+			10 : stores._cabela,
+			11 : stores._orscheln,
+			12 : stores._ruralking,
+			13 : stores._sears,
+			14 : stores._valleyvet,
+			15 : stores._lowes,
+			16 : stores._lowes,
+			17 : stores._home_depot,
+			23 : stores._home_depot,
+			24 : stores._lowes,
+			25 : stores._farm_and_home,
+			26 : stores._menards,
+			27 : stores._menards,
+			36 : stores._dickeybub,
+			37 : stores._acehardware,
+			43 : stores._bootbarn,
+			44 : stores._shelper,
+			73 : stores._tsc,
+			74 : stores._tsc,
+			124: stores._tsc
 		}
-		switch.get(self.comp_id,self._default)()
+		switch.get(self.comp_id,stores._default)(self)
 		return
 
 #Competitor specific methods
-
-	def _academy(self):
-		price_selectors = {"input#dlItemPrice":"value",}
-		sale_selectors = {"span#currentPrice":"innerHTML",}
-		broken_link_selectors = {"p#search_results_total_count":"innerHTML"}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to aquire pricing data")
-		#No third party
-		#check out of stock
-		try:
-			try:
-				oos = self.driver.find_element_by_css_selector("button#add2CartBtn").get_attribute("innerHTML")
-			except:
-				oos = "in stock"
-			if "Out of Stock" in oos:
-				self.set_out_of_stock()
-		except:
-			self._log("Out of stock check failed")
-		finally:
-			self._kill_driver()
-		return
-
-	def _acehardware(self):
-		price_selectors = {"div.productPrice span script":"innerHTML",}
-		try:
-			self.pricing(price_selectors)
-		except:
-			self._log("Failed to aquire pricing data")
-		#No third party
-		#No out of stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _basspro(self):
-		loc_ins = """
-bpsku = loc_data.basspro(self)
-for p,value in price_dict.iteritems():
-	price_dict[p.format(bpsku)] = price_dict.pop(p)
-for p,value in sale_dict.iteritems():
-	sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
-		price_selectors = {"span#listPrice_{}.old_price":"innerHTML",\
-		"span#offerPrice_{} > span":"innerHTML"}
-		sale_selectors = {"span#offerPrice_{}.price.sale > span":"innerHTML"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
-		except:
-			self._log("Failed to acqure pricing data")
-		finally:
-			self._kill_driver()
-		return
-
-	def _blain(self):
-		price_selectors = {"meta[itemprop=lowprice]":"content",\
-		"div.active-price>div.price>span":"innerHTML",\
-		"div.original-price>span.price>span":"innerHTML"}
-		sale_selectors = {"div.active-price.promo > div.price > span:not([class])":"innerHTML",}
-		broken_link_selectors = {"div.list-header-text > span":"innerHTML"}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-		#No third party
-		try:
-			if not self._find_data("span.stock-msg.in-stock"):
-				self.set_out_of_stock()
-		except:
-			self._log("Out of stock check failed")
-		finally:
-			self._kill_driver()
-		return
-
-	def _bootbarn(self):
-		price_selectors = {"span.price-original.price-holder-alt":"innerHTML",\
-		"h6.product-callout-title > strong":"innerHTML"}
-		sale_selectors = {"h6.product-callout-title > strong":"innerHTML"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to aquire pricing data")
-		#no third Party
-		#no out of stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _cabela(self):
-		price_selectors = {"dd.regularnprange":"innerHTML",\
-		"div.price > dl > dd.nprange":"innerHTML"}
-		sale_selectors = {"dd.saleprice":"innerHTML"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-		finally:
-			self._kill_driver()
-		return
-
-	def _dickeybub(self):
-		price_selectors = {"p.price > del > span.woocommerce-Price-amount.amount" : "innerHTML",\
-		"p.price > span.woocommerce-Price-amount.amount" : "innerHTML",}
-		sale_selectors = {"p.price > ins > span.woocommerce-Price-amount.amount" : "innerHTML",}
-		try:
-			self.pricing(price_selectors,sale_selectors,)
-		except:
-			self._log("Failed to acquire pricing data")
-		finally:
-			self._kill_driver()
-		return
-
-	def _home_depot(self):
-		if self.comp_id == 23:
-			loc_ins = "loc_data.home_depot(self,62226)"
-		elif self.comp_id == 5:
-			loc_ins = "loc_data.home_depot(self,63028)"
-		elif self.comp_id == 17:
-			loc_ins = "loc_data.home_depot(self,62650)"
-		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
-		sale_selectors = {"span#ajaxPrice":"content"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
-		except:
-			raise
-			self._log("Failed to acquire pricing data")
-		try:
-			WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
-			if '0' in self._retrieve_data("span.quantity","innerHTML"):
-				self.set_out_of_stock()
-		except:
-			self._log("Out of stock check failed")
-		finally:
-			self._kill_driver()
-		return
-
-	def _farm_and_home(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		self.set_undefined()
-		return
-
-	def _lowes(self):
-		if self.comp_id == 6:
-			loc_ins = "loc_data.lowes(self,63028)"
-		elif self.comp_id == 15:
-			loc_ins = "loc_data.lowes(self,63701)"
-		elif self.comp_id == 16:
-			loc_ins = "loc_data.lowes(self,62704)"
-		elif self.comp_id == 24:
-			loc_ins = "loc_data.lowes(self,62221)"
-		price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
-		"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
-		sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
-		except:
-			self._log("Failed to acquire pricing data")
-		finally:
-			self._kill_driver()
-		return
-
-	def _menards(self):
-		if self.comp_id == 7:
-			loc_ins = "loc_data.menards(self,'3286')"
-		elif self.comp_id == 26:
-			loc_ins = "loc_data.menards(self,'3334')"
-		elif self.comp_id == 27:
-			loc_ins = "loc_data.menards(self,'3293')"
-
-		price_selectors = {"span.bargainStrike" : "innerHTML",\
-		"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
-		"span#totalItemPriceFloater" : "innerHTML"}
-		sale_selectors = {"span.bargainPrice" : "innerHTML", \
-		"span#totalItemPriceFloater" : "innerHTML"}
-		broken_link_selectors = {"h3.resettitle":"innerHTML"}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
-		except:
-			self._log("Failed to acquire pricing data")
-		finally:
-			self._kill_driver()
-		return
-
-	def _orscheln(self):
-		price_selectors = {"span.product_unit_price" : "innerHTML",}
-		sale_selectors = {"":""}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-		#No third party
-		#No out of stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _ruralking(self):
-		price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML"}
-		sale_selectors = {"":""}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-		try:
-			time.sleep(5)
-			self.driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %self.sku))
-			if "OUT OF STOCK" in self._retrieve_data("div.product-shop h1[style]","innerHTML"):
-				self.set_out_of_stock()
-		except:
-			pass
-		finally:
-			self._kill_driver()
-		return
-		# sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
-
-	def _sears(self):
-		price_selectors = {"span.price-wrapper":"innerHTML"}
-		sale_selectors = {"h4.redSalePrice span.price-wrapper":"innerHTML"}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-		#No Third Party
-		#No out of Stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _shelper(self):
-		price_selectors = {"div.product-content-inner > div.product-price > span.price-original.price-holder-alt > strong" : "innerHTML",}
-		sale_selectors = {"div.product-content-inner > div.product-callout > h6.product-callout-title > strong" : "innerHTML",}
-		broken_link_selectors = {"":""}
-		try:
-			self.pricing(price_selectors,sale_selectors)
-		except:
-			self._log("Failed to acquire pricing data")
-			#No third party
-			#No out of stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _tsc(self):
-		#view in cart item
-		# https://www.tractorsupply.com/tsc/product/jonsered-502cc-gas-chainsaw-cs2250s?cm_vc=-10005
-		if self.comp_id == 73:
-			loc_ins = "loc_data.tsc(self,'63049')"
-		elif self.comp_id == 74:
-			loc_ins = "loc_data.tsc(self,'63701')"
-		elif self.comp_id == 8:
-			loc_ins = "loc_data.tsc(self,'63640')"
-		elif self.comp_id == 124:
-			loc_ins = "loc_data.tsc(self,'63801')"
-		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
-		sale_selectors = {"span.dollar_price":"innerHTML"}
-		broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
-		except:
-			self._log("Failed to acquire pricing data")
-			#no third party
-			#no out of stock
-		finally:
-			self._kill_driver()
-		return
-
-	def _valleyvet(self):
-		self._log("Competitor: %d not yet defined" %self.comp_id)
-		self.set_undefined()
-		return
-
-	def _walmart(self):
-		price_selectors = {"div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group" : "title",\
-		"div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
-		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
-		"span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group" : "title",}
-		broken_link_selectors = {"div.font-semibold.prod-Bot-partial-head" : "innerHTML",\
-		"p.error-ErrorPage-copy":"innerHTML"}
-		sale_selectors = {}
-		try:
-			self.pricing(price_selectors,sale_selectors,broken_link_selectors)
-		except:
-			self._log("Failed to aquire pricing data")
-		#check for Third party
-		try:
-			if self._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
-					sellers = self.driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
-					for sell in sellers:
-						if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
-							self.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
-							break
-			elif not self._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
-				self.set_third_party()
-
-		except:
-			self._log("Third party check failed")
-		#check Out of stock
-		try:
-			try:
-				oos = self.driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")
-			except:
-				oos = "in stock"
-			if "Out of stock" in oos:
-				self.set_out_of_stock()
-		except:
-			self._log("Out of stock check failed")
-		finally:
-				self._kill_driver()
-		return
-
-	def _default(self):
-		self._log("Unknown Competitor ID")
-		self.set_undefined()
-		return

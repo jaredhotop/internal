@@ -4,7 +4,7 @@
 
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -158,11 +158,11 @@ class Entry:
 		return self.ip
 
 	def _create_driver(self):
-		chrome_options = Options()
-		chrome_options.add_argument("--headless")
-		chrome_options.add_argument("--disable-gpu")
-		chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
-		self.driver = webdriver.Chrome(os.path.expanduser('~/bin/chromedriver'),chrome_options = chrome_options)
+		firefox_options = Options()
+		firefox_options.add_argument("--headless")
+		# firefox_options.add_argument("--disable-gpu")
+		# firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
+		self.driver = webdriver.Firefox(executable_path = os.path.expanduser('~/bin/geckodriver'),firefox_options = firefox_options)
 		self._log("Driver created",True)
 		return self.driver
 
@@ -205,6 +205,7 @@ class Entry:
  		except:
 			self.driver = None
  			self._log("Driver failed to start")
+			raise
  		else:
  			try:
 				if loc_ins:
@@ -427,6 +428,7 @@ for p,value in sale_dict.iteritems():
 		try:
 			self.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 		except:
+			raise
 			self._log("Failed to acquire pricing data")
 		try:
 			WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))

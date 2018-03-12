@@ -56,11 +56,11 @@ class Entry:
 		self.comp_shop_out_of_stock = False
 		self.comp_shop_third_party = False
 		self.url = url
-		self.broken_flag = False
-		self.log_msg = ''
+		self._broken_flag = False
+		self._log_msg = ''
 		self.pagedata = None
-		self.defined = True
-		self.ip =ip
+		self._defined = True
+		self.ip = ip
 
 	def __repr__(self):
 		return "Entry('{}','{}','{}','{}','{}','{}','{}','{}')".format(self.comp_id, self.link_id,\
@@ -76,13 +76,13 @@ class Entry:
 			with open(file, "a") as f:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
-		elif self.broken_flag:
-			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
-		elif not self.defined:
-			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
+		elif self._broken_flag:
+			self._log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
+		elif not self._defined:
+			self._log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
 		else:
 			self._log("Entry not valid. Writing to alternate file.")
-			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self._get_ip()))
+			self._log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
 		return
 
 
@@ -133,35 +133,20 @@ class Entry:
 		return
 
 	def set_undefined(self):
-		self.defined = False
+		self._defined = False
 		return
 
-	def _get_url(self):
-		return str(self.url)
-
-	def get_unique_id(self):
-		return self.unique_id
-
-	def get_driver(self):
-		return self.driver
-
-	def get_comp_id(self):
-		return self.comp_id
-
 	def _get_broken(self):
-		return True if self.broken_flag else False
+		return True if self._broken_flag else False
 
 	def _get_price(self):
 		return self.comp_price
 
-	def _get_ip(self):
-		return self.ip
-
 	def _create_driver(self):
 		firefox_options = Options()
 		firefox_options.add_argument("--headless")
-		# firefox_options.add_argument("--disable-gpu")
-		# firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
+		# chrome_options.add_argument("--disable-gpu")
+		firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
 		self.driver = webdriver.Firefox(executable_path = os.path.expanduser('~/bin/geckodriver'),firefox_options = firefox_options)
 		self._log("Driver created",True)
 		return self.driver
@@ -175,8 +160,8 @@ class Entry:
 		return
 
 	def _log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine{}.log")):
-		file = file.format(self._get_ip())
-		self.log_msg = self.log_msg + " \n" + log_msg
+		file = file.format(self.ip)
+		self._log_msg = self._log_msg + " \n" + log_msg
 		now = datetime.now()
 		if not print_only and not test_mach:
 			with open(file,"a") as f:
@@ -216,7 +201,7 @@ class Entry:
 							continue
 						else:
 							break
- 				driver.get(self._get_url())
+ 				driver.get(str(self.url))
 				self.pagedata = driver.page_source.encode('utf-8')
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)
@@ -258,7 +243,7 @@ class Entry:
 				try:
 					for key,value in broken_dict.iteritems():
 						if self._find_data(key,value):
-							self.broken_flag = True
+							self._broken_flag = True
 				except:
 					pass
 		return
@@ -416,11 +401,11 @@ for p,value in sale_dict.iteritems():
 		return
 
 	def _home_depot(self):
-		if self.get_comp_id() == 23:
+		if self.comp_id == 23:
 			loc_ins = "loc_data.home_depot(self,62226)"
-		elif self.get_comp_id() == 5:
+		elif self.comp_id == 5:
 			loc_ins = "loc_data.home_depot(self,63028)"
-		elif self.get_comp_id() == 17:
+		elif self.comp_id == 17:
 			loc_ins = "loc_data.home_depot(self,62650)"
 		price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
 		sale_selectors = {"span#ajaxPrice":"content"}
@@ -446,13 +431,13 @@ for p,value in sale_dict.iteritems():
 		return
 
 	def _lowes(self):
-		if self.get_comp_id() == 6:
+		if self.comp_id == 6:
 			loc_ins = "loc_data.lowes(self,63028)"
-		elif self.get_comp_id() == 15:
+		elif self.comp_id == 15:
 			loc_ins = "loc_data.lowes(self,63701)"
-		elif self.get_comp_id() == 16:
+		elif self.comp_id == 16:
 			loc_ins = "loc_data.lowes(self,62704)"
-		elif self.get_comp_id() == 24:
+		elif self.comp_id == 24:
 			loc_ins = "loc_data.lowes(self,62221)"
 		price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
 		"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
@@ -467,11 +452,11 @@ for p,value in sale_dict.iteritems():
 		return
 
 	def _menards(self):
-		if self.get_comp_id() == 7:
+		if self.comp_id == 7:
 			loc_ins = "loc_data.menards(self,'3286')"
-		elif self.get_comp_id() == 26:
+		elif self.comp_id == 26:
 			loc_ins = "loc_data.menards(self,'3334')"
-		elif self.get_comp_id() == 27:
+		elif self.comp_id == 27:
 			loc_ins = "loc_data.menards(self,'3293')"
 
 		price_selectors = {"span.bargainStrike" : "innerHTML",\
@@ -553,13 +538,13 @@ for p,value in sale_dict.iteritems():
 	def _tsc(self):
 		#view in cart item
 		# https://www.tractorsupply.com/tsc/product/jonsered-502cc-gas-chainsaw-cs2250s?cm_vc=-10005
-		if self.get_comp_id() == 73:
+		if self.comp_id == 73:
 			loc_ins = "loc_data.tsc(self,'63049')"
-		elif self.get_comp_id() == 74:
+		elif self.comp_id == 74:
 			loc_ins = "loc_data.tsc(self,'63701')"
-		elif self.get_comp_id() == 8:
+		elif self.comp_id == 8:
 			loc_ins = "loc_data.tsc(self,'63640')"
-		elif self.get_comp_id() == 124:
+		elif self.comp_id == 124:
 			loc_ins = "loc_data.tsc(self,'63801')"
 		price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
 		sale_selectors = {"span.dollar_price":"innerHTML"}

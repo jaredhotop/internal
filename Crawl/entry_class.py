@@ -432,7 +432,7 @@ for p,value in sale_dict.iteritems():
 			self._log("Failed to acquire pricing data")
 		try:
 			WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
-			if self._retrieve_data("span.quantity","innerHTML"):
+			if '0' in self._retrieve_data("span.quantity","innerHTML"):
 				self.set_out_of_stock()
 		except:
 			self._log("Out of stock check failed")

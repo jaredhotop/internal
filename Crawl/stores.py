@@ -120,6 +120,11 @@ def dickeybub(obj):
 		obj.kill_driver()
 	return
 
+def farm_and_home(obj):
+	obj.log("Competitor: %d not yet defined" %obj.comp_id)
+	obj.set_undefined()
+	return
+
 def home_depot(obj):
 	if obj.comp_id == 23:
 		loc_ins = "loc_data.home_depot(self,62226)"
@@ -137,18 +142,13 @@ def home_depot(obj):
 		obj.log("Failed to acquire pricing data")
 	try:
 		WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
-		if '0' in obj._retrieve_data("span.quantity","innerHTML"):
+		if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
 			obj.set_out_of_stock()
 	except:
          raise
          obj.log("Out of stock check failed")
 	finally:
 		obj.kill_driver()
-	return
-
-def farm_and_home(obj):
-	obj.log("Competitor: %d not yet defined" %obj.comp_id)
-	obj.set_undefined()
 	return
 
 def lowes(obj):

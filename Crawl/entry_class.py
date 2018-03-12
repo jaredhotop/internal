@@ -175,7 +175,7 @@ class Entry:
 		try:
 			temp = self._driver.find_element_by_css_selector(selector).get_attribute(value) if value else self._driver.find_element_by_css_selector(selector)
 		except:
-			return False
+			return ""
 		else:
 			return temp.encode('utf-8')
 

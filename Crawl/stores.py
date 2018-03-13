@@ -134,7 +134,7 @@ def home_depot(obj):
 		loc_ins = "loc_data.home_depot(self,62650)"
 	price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
 	sale_selectors = {"span#ajaxPrice":"content"}
-	broken_link_selectors = {"":""}
+	broken_link_selectors = {"div.buybelt__flex-wrapper.buybelt__store-wrapper span.u__text--danger":"innerHTML|||Unavailable"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
@@ -145,7 +145,6 @@ def home_depot(obj):
 		if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
 			obj.set_out_of_stock()
 	except:
-         raise
          obj.log("Out of stock check failed")
 	finally:
 		obj.kill_driver()
@@ -163,11 +162,11 @@ def lowes(obj):
 	price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
 	"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
 	sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
-	broken_link_selectors = {"":""}
+	broken_link_selectors = {"div.alert.alert-warning i.icon-error-outline.red":""}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-		obj.log("Failed to acquire pricing data")
+         obj.log("Failed to acquire pricing data")
 	finally:
 		obj.kill_driver()
 	return

@@ -179,12 +179,21 @@ class Entry:
 		else:
 			return temp.encode('utf-8')
 
-	def _find_data(self,select,value = 'innerHTML'):
+	def _find_data(self,select,value = 'innerHTML',check_value = None):
 		try:
-			self._driver.find_element_by_css_selector(select).get_attribute(value)
-			return True
+			if check_value:
+				if check_value in self._driver.find_element_by_css_selector(select).get_attribute(value):
+					return True
+				else:
+					return False
+			else:
+				try:
+					self._driver.find_element_by_css_selector(select).get_attribute(value)
+					return True
+				except:
+			 		return False
 		except:
-			 return False
+			self.log("Error in _find_data")
 
 	def pricing(self,price_dict,sale_dict = None,broken_dict = None,loc_ins = None):
 		try:
@@ -192,7 +201,6 @@ class Entry:
  		except:
 			self._driver = None
  			self.log("Driver failed to start")
-
  		else:
  			try:
 				if loc_ins:
@@ -246,7 +254,11 @@ class Entry:
 						self.set_sale_price(0.00)
 				try:
 					for key,value in broken_dict.iteritems():
-						if self._find_data(key,value):
+						print(key,value)
+						param = value.split('|||')
+						if  len(param) < 2:
+							param.append(None)
+						if self._find_data(key,param[0],param[1]):
 							self._broken_flag = True
 				except:
 					pass

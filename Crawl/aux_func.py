@@ -21,4 +21,6 @@ def clean(string):
 	string = string.strip()
 	string = string.replace("$","")
 	string = string.split('-')
+	if '.' not in string[0]:
+		string[0] = string[0][:-2] + '.' +string[0][-2:]
 	return float(string[0])

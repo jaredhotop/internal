@@ -181,7 +181,8 @@ def menards(obj):
 
 	price_selectors = {"span.bargainStrike" : "innerHTML",\
 	"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
-	"span#totalItemPriceFloater" : "innerHTML"}
+	"span#totalItemPriceFloater" : "innerHTML",
+    "span.finalPriceSpan.leftFloat":"innerText" }
 	sale_selectors = {"span.bargainPrice" : "innerHTML", \
 	"span#totalItemPriceFloater" : "innerHTML"}
 	broken_link_selectors = {"h3.resettitle":"innerHTML"}

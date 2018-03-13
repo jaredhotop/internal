@@ -254,7 +254,6 @@ class Entry:
 						self.set_sale_price(0.00)
 				try:
 					for key,value in broken_dict.iteritems():
-						print(key,value)
 						param = value.split('|||')
 						if  len(param) < 2:
 							param.append(None)

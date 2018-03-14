@@ -133,7 +133,8 @@ def home_depot(obj):
 		loc_ins = "loc_data.home_depot(self,63028)"
 	elif obj.comp_id == 17:
 		loc_ins = "loc_data.home_depot(self,62650)"
-	price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
+	price_selectors = {"input#ciItemPrice":"value","span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML",\
+	"span#ajaxPrice":"content"}
 	sale_selectors = {"span#ajaxPrice":"content"}
 	broken_link_selectors = {"div.buybelt__flex-wrapper.buybelt__store-wrapper span.u__text--danger":"innerHTML|||Unavailable",\
 	"div#productinfo_ctn > div.error >p":"innerHTML|||not currently available"}
@@ -141,12 +142,18 @@ def home_depot(obj):
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
 		obj.log("Failed to acquire pricing data")
+		#Out of stock check
 	try:
-		WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
-		if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
-			obj.set_out_of_stock()
-	except TimeoutException as error:
-		pass
+		try:
+			if obj._find_data("input#availableInLocalStore","value|||false"):
+				obj.set_out_of_stock()
+		except:
+			try:
+				WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
+				if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
+					obj.set_out_of_stock()
+			except TimeoutException as error:
+				pass
 	except:
 		obj.log("Out of stock check failed")
 	finally:
@@ -162,7 +169,7 @@ def lowes(obj):
 		loc_ins = "loc_data.lowes(self,62704)"
 	elif obj.comp_id == 24:
 		loc_ins = "loc_data.lowes(self,62221)"
-	price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
+	price_selectors = {"input[name=productId]":"data-productprice","span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
 	"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
 	sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
 	broken_link_selectors = {"div.alert.alert-warning i.icon-error-outline.red":"",\
@@ -219,20 +226,21 @@ def orscheln(obj):
 	return
 
 def ruralking(obj):
-	price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML"}
+	price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML",\
+	"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
 	sale_selectors = {"":""}
-	broken_link_selectors = {"":""}
+	broken_link_selectors = {"div.page-head-alt >h3":"innerHTML|||Sorry"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:
 		obj.log("Failed to acquire pricing data")
 	try:
-		time.sleep(5)
-		obj._driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
 		if "OUT OF STOCK" in obj._retrieve_data("div.product-shop h1[style]","innerHTML"):
 			obj.set_out_of_stock()
+		elif obj._find_data("p.prod_availability >span.backorder"):
+			obj.set_out_of_stock()
 	except:
-		pass
+		obj.log("Out of stock check failed")
 	finally:
 		obj.kill_driver()
 	return

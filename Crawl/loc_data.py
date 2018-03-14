@@ -36,7 +36,7 @@ def lowes(obj,store):
     driver.find_element_by_id("search-box").send_keys(store,Keys.ENTER)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "js-store-locator-select-store")))
     driver.find_element_by_class_name("js-store-locator-select-store").click()
-    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
+    # driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
     return driver
 
 def home_depot(obj,store):
@@ -47,16 +47,19 @@ def home_depot(obj,store):
     WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "a.bttn-outline[data-storeid]")))
     driver.find_element_by_css_selector("a.bttn-outline[data-storeid]").click()
     WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "span.sfmystoreicon")))
-    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
+    # driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
     return driver
 
 def basspro(obj):
     driver = obj._driver
     driver.get(obj.url)
-    driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
+    # driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png" %obj.sku))
     bpsku = obj._retrieve_data("meta[name=pageId]","content")
     if not bpsku:
         obj._log("Failed to extract BassPro Sku")
         return
     else:
         return int(bpsku)
+
+def ruralking(obj):
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "a.bv-rating-stars-container.bv-focusable span.bv-rating-stars.bv-rating-stars-off")))

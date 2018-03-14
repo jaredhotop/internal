@@ -1,8 +1,5 @@
 import socket
 import re
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support import expected_conditions as EC
 
 def get_ip():
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

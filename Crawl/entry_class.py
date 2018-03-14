@@ -16,6 +16,7 @@ import csv
 import shutil
 import os
 import stores
+import time
 #from io import StringIO   #what is this line for?
 import sys
 sys.path.append( os.path.expanduser("~/Documents"))
@@ -24,7 +25,6 @@ try:
 except:
 	test_mach = 0
 	email_crash_report = 1
-import time
 
 
 class Entry:
@@ -221,6 +221,8 @@ class Entry:
 						else:
 							break
  				driver.get(str(self.url))
+				if self.comp_id == 12:
+					time.sleep(5)
 				self.pagedata = driver.page_source.encode('utf-8')
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)

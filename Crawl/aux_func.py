@@ -16,7 +16,8 @@ def get_ip():
 		return IP
 
 def clean(string):
-	non_decimal = re.compile(r'[^\d.]+')
+	string = string.replace("to","-")
+	non_decimal = re.compile(r'[^\d.]+') # remove all alpha chars
 	string = non_decimal.sub('', string)
 	string = string.strip()
 	string = string.replace("$","")

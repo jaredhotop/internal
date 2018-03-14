@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -134,18 +135,20 @@ def home_depot(obj):
 		loc_ins = "loc_data.home_depot(self,62650)"
 	price_selectors = {"span#ajaxPriceStrikeThru":"innerHTML","span#ajaxPriceAlt":"innerHTML","span#ajaxPrice":"content"}
 	sale_selectors = {"span#ajaxPrice":"content"}
-	broken_link_selectors = {"div.buybelt__flex-wrapper.buybelt__store-wrapper span.u__text--danger":"innerHTML|||Unavailable"}
+	broken_link_selectors = {"div.buybelt__flex-wrapper.buybelt__store-wrapper span.u__text--danger":"innerHTML|||Unavailable",\
+	"div#productinfo_ctn > div.error >p":"innerHTML|||not currently available"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-
 		obj.log("Failed to acquire pricing data")
 	try:
 		WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
 		if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
 			obj.set_out_of_stock()
+	except TimeoutException as error:
+		pass
 	except:
-         obj.log("Out of stock check failed")
+		obj.log("Out of stock check failed")
 	finally:
 		obj.kill_driver()
 	return
@@ -162,11 +165,18 @@ def lowes(obj):
 	price_selectors = {"span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
 	"span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
 	sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
-	broken_link_selectors = {"div.alert.alert-warning i.icon-error-outline.red":""}
+	broken_link_selectors = {"div.alert.alert-warning i.icon-error-outline.red":"",\
+	" div.pd-shipping-delivery.met-fulfillment-delivery.grid-50.tablet-grid-50 div.media-body > p":"innerHTML|||unavailable"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
 	except:
-         obj.log("Failed to acquire pricing data")
+		obj.log("Failed to acquire pricing data")
+	#Out of stock check
+	try:
+		if obj._find_data("div.fulfillment-method div.media-body >p","innerHTML|||Unavailable"):
+			obj.set_out_of_stock()
+	except:
+		obj.log("Out of stock check failed")
 	finally:
 		obj.kill_driver()
 	return
@@ -182,7 +192,7 @@ def menards(obj):
 	price_selectors = {"span.bargainStrike" : "innerHTML",\
 	"span.EDLP.fontSize16.fontBold.alignRight" : "innerHTML",\
 	"span#totalItemPriceFloater" : "innerHTML",
-    "span.finalPriceSpan.leftFloat":"innerText" }
+	"span.finalPriceSpan.leftFloat":"innerText" }
 	sale_selectors = {"span.bargainPrice" : "innerHTML", \
 	"span#totalItemPriceFloater" : "innerHTML"}
 	broken_link_selectors = {"h3.resettitle":"innerHTML"}

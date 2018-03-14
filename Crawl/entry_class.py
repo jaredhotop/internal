@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -79,12 +80,12 @@ class Entry:
 				out = csv.writer(f, delimiter = ",")
 				out.writerow(self._data_tup())
 		elif self._broken_flag:
-			self.log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
+			self.log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
 		elif not self._defined:
-			self.log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
+			self.log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
 		else:
 			self.log("Entry not valid. Writing to alternate file.")
-			self.log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten%s.csv' %self.ip))
+			self.log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
 		return
 
 
@@ -179,7 +180,13 @@ class Entry:
 		else:
 			return temp.encode('utf-8')
 
-	def _find_data(self,select,value = 'innerHTML',check_value = None):
+	def _find_data(self,select,value = 'innerHTML'):
+		param = value.split('|||')
+		if  len(param) >= 2:
+			value = param[0]
+			check_value = param[1]
+		else:
+			check_value = None
 		try:
 			if check_value:
 				if check_value in self._driver.find_element_by_css_selector(select).get_attribute(value):
@@ -192,6 +199,8 @@ class Entry:
 					return True
 				except:
 			 		return False
+		except NoSuchElementException:
+			pass
 		except:
 			self.log("Error in _find_data")
 
@@ -208,7 +217,6 @@ class Entry:
 						try:
 							exec(loc_ins)
 						except:
-
 							continue
 						else:
 							break
@@ -217,7 +225,6 @@ class Entry:
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
 				# 	f.write(self.pagedata)
  			except:
-
  				self.log("Failed to retrieve url")
  			else:
 				#Find Price
@@ -231,6 +238,8 @@ class Entry:
 								break
  						except:
  							continue
+					else:
+						self.log("No valid price found")
  				except:
  					self.log("Failed to retrieve competitor price")
  				#Find Sale Price
@@ -254,13 +263,16 @@ class Entry:
 						self.set_sale_price(0.00)
 				try:
 					for key,value in broken_dict.iteritems():
-						param = value.split('|||')
-						if  len(param) < 2:
-							param.append(None)
-						if self._find_data(key,param[0],param[1]):
-							self._broken_flag = True
+						if value:
+							if self._find_data(key,value):
+								self._broken_flag = True
+								self.log("link flagged as broken")
+						else:
+							if self._find_data(key):
+								self._broken_flag = True
+								self.log("link flagged as broken")
 				except:
-					pass
+					self.log("Error checking broken link in the pricing function")
 		return
 
 

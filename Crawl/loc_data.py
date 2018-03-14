@@ -60,6 +60,3 @@ def basspro(obj):
         return
     else:
         return int(bpsku)
-
-def ruralking(obj):
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "a.bv-rating-stars-container.bv-focusable span.bv-rating-stars.bv-rating-stars-off")))

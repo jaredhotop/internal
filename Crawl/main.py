@@ -1,7 +1,6 @@
 # Competitor pricing crawler v1.0
 # written by: Jayson Scruggs
 # Property of Buchheit
-import set_loc
 import entry_class
 import aux_func
 import os
@@ -9,6 +8,7 @@ import csv
 import smtplib
 import sys
 import shutil
+import traceback
 sys.path.append( os.path.expanduser("~/Documents"))
 try:
 	from crawlconfig import *
@@ -47,7 +47,8 @@ except:
         server = smtplib.SMTP('smtp.gmail.com',587)
         server.starttls()
         server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
-        msg ="Script Failed on Clone %s " %ip[3]
+        msg ="Script Failed on Clone %s:\n" %ip[3]
+		msg = msg + traceback.format_exc()
         server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg)
         server.quit()
     else:

@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import entry_class
 from datetime import datetime
+import time
 
 def menards(obj,store):
     driver = obj._driver
@@ -60,3 +61,27 @@ def basspro(obj):
         return
     else:
         return int(bpsku)
+
+def autozone(obj):
+    driver = obj._driver
+    driver.get(obj.url)
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div#deals-and-savings a.save-now")))
+    except:
+        return
+    else:
+        try:
+            driver.find_element_by_css_selector("div#deals-and-savings a.save-now").click()
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "li.single-shelf.clearfix.last a.actionButton.orange")))
+            driver.find_element_by_css_selector("li.single-shelf.clearfix.last a.actionButton.orange").click()
+            time.sleep(5)
+            # WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table.innerTable input.numeric")))
+            driver.execute_script('document.querySelector("table.innerTable input.numeric").click()')
+            driver.execute_script('document.querySelector("table.innerTable input.numeric").value=1')
+            driver.execute_script("$('div.deal_step.opened.clearfix p.clearfix.right input.actionButton.nextStep').removeClass('disabled')")
+            driver.execute_script("$('div.deal_step.opened.clearfix p.clearfix.right input.actionButton.nextStep').addClass('active')")
+            time.sleep(1)
+            driver.execute_script("$('div.deal_step.opened.clearfix p.clearfix.right input.actionButton.nextStep').click()")
+            return
+        except:
+            return

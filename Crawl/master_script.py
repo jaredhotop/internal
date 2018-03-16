@@ -7,7 +7,7 @@ Q = Queue.Queue()
  def aggr_uwritten():
      for file in os.listdir("/media/WebCrawl"):
      if file.endswith(".csv") and 'master' not in file:
-        with open(os.path.join("/media/WebCrawl/",file),"r") as in_f:
+        with open(os.path.join("/media/WebCrawl/unwritten/",file),"r") as in_f:
             read = csv.reader(in_f , delimiter=",")
             for row in read:
                 Q.put(row)

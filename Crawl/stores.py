@@ -42,6 +42,27 @@ def acehardware(obj):
 		obj.kill_driver()
 	return
 
+def autozone(obj):
+	price_selectors = {"table.part-pricing-info td.price.base-price" : "innerText",}
+	sale_selectors = {"span.price.light-gray>strong":"innerHTML"}
+	broken_link_selectors = {"":""}
+	loc_ins="loc_data.autozone(self)"
+	try:
+		obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+	except:
+		obj.log("Failed to acquire pricing data")
+	#No third party
+	#out of stock check
+	try:
+		if obj._find_data("div.button-bar-msg-out-of-stock","innerText|||Not Available"):
+			obj.set_out_of_stock()
+	except:
+		obj.log("out of stock check failed")
+
+	finally:
+		obj.kill_driver()
+	return
+
 def basspro(obj):
 	loc_ins = """
 bpsku = loc_data.basspro(obj)
@@ -215,6 +236,23 @@ def orscheln(obj):
 	price_selectors = {"span.product_unit_price" : "innerHTML",}
 	sale_selectors = {"":""}
 	broken_link_selectors = {"":""}
+	try:
+		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
+	except:
+		obj.log("Failed to acquire pricing data")
+	#No third party
+	#No out of stock
+	finally:
+		obj.kill_driver()
+	return
+
+def petsense(obj):
+	obj.log("Competitor: %d not yet defined" %obj.comp_id)
+	obj.set_undefined()
+	return
+	price_selectors = {"div#product_price span.money" : "innerHTML",}
+	sale_selectors = {"":""}
+	broken_link_selectors = {"div.selector-wrapper>select.single-option-selector":"innerHTML"}
 	try:
 		obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
 	except:

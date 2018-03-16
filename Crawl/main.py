@@ -17,6 +17,21 @@ except:
 	email_crash_report = 1
 import time
 
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+
+
+try:
+	os.remove(shutil.move(os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3])))
+	os.remove(shutil.move(os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3])))
+except:
+	print("Failed to delete previous files!")
+	msg ="Script Failed to delete previous files on Clone %s:\n" %ip[3]
+	msg = msg + traceback.format_exc()
+	server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg)
+	server.quit()
+
 try:
     ip = aux_func.get_ip().split(".")
     file_name = os.path.expanduser("/media/WebCrawl/inputs/tsclinks%s.csv" %ip[3])
@@ -40,13 +55,10 @@ try:
 		del obj
 		print("search: ", len(search_arr))
 		print("written: ", len(written_arr))
-    shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten_%s.csv" %ip[3]))
+    shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
     shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
 except:
     if email_crash_report:
-        server = smtplib.SMTP('smtp.gmail.com',587)
-        server.starttls()
-        server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
         msg ="Script Failed on Clone %s:\n" %ip[3]
 		msg = msg + traceback.format_exc()
         server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg)

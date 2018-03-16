@@ -221,7 +221,7 @@ class Entry:
 						else:
 							break
  				driver.get(str(self.url))
-				if self.comp_id == 12:
+				if self.comp_id == 12 or self.comp_id == 70:
 					time.sleep(5)
 				self.pagedata = driver.page_source.encode('utf-8')
 				# with open(os.path.expanduser("~/Documents/pagedata.txt"),'w') as f:
@@ -281,6 +281,7 @@ class Entry:
 	def crawl(self):
 		switch = {
 			1  : stores.academy,
+			70 : stores.autozone,
 			2  : stores.basspro,
 			3  : stores.blain,
 			4  : stores.farm_and_home,
@@ -308,6 +309,7 @@ class Entry:
 			44 : stores.shelper,
 			73 : stores.tsc,
 			74 : stores.tsc,
+			123: stores.petsense,
 			124: stores.tsc
 		}
 		switch.get(self.comp_id,stores._default)(self)

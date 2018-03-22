@@ -1,0 +1,75 @@
+#Documentation for Web Crawler
+#Written by: Jayson Scruggs
+#Property of Buchheit
+
+
+Complete documentation of methods in entry_class.py:
+
+def __init__(self, comp_id, link_id, sku, manual, shop_promo, match_id, url,ip):
+      This method initializes an instance of the class. It creates all the necessary attributes for use in the crawl.
+
+      Parameters:
+          self - The instance of the class itself. this is implicitly passed when the init method is called
+          comp_id -
+          link_id -
+          sku -
+          manual -
+          shop_promo -
+          match_id -
+          url - The url that will be crawled by the script
+          ip -  The ip of the machine running the script. Used in file naming to identify the files to the script, and to sign outputs.
+
+      Returned value:
+          instance of the class
+
+      Set values:
+          unique_id = YYYYMMDD{comp_id}{sku}
+          comp_id = parameter comp_id
+          comp_match = 0
+          comp_price = Null
+          comp_sale_price = Null
+          comp_shop_leader = False
+          comp_shop_notes = Null
+          create_date = current Datetime
+          created_by_tm = 8
+          last_update_date = create_date
+          link_id = parameter link_id
+          sku = parameter sku
+          shop_date = create_date
+          updated_by_tm =  8
+          reviewed = 0
+          reviewed_by = 4
+          reviewed_date = 3000-12-31 01:00:00
+          comp_shop_manual = parameter manual
+          comp_shop_promo = parameter shop_promo
+          comp_match_id = parameter match_id
+          comp_shop_out_of_stock = False
+          comp_shop_third_party = False
+          url = parameter url
+          _driver = Null
+          _log_msg = ''
+          pagedata = Null
+          _defined = True
+          ip = parameter ip
+
+      Example use:
+          This method is invoked at object creation
+          obj = Entry({comp_id}, {link_id}, {sku}, {manual}, {shop_promo}, {match_id}, {url},{ip})
+
+def __repr__(self):
+      A development function that prints a representation of the object.
+
+      Parameters:
+          instance of the Entry class
+
+      Returned value:
+          a line that could be copied and pasted to create the instance over again.
+
+      Set values:
+          None
+
+      Example use:
+          print(__repr__(obj))
+
+def __str__(self):
+      A more user friendly representation of the object

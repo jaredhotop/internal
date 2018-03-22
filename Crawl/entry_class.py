@@ -155,12 +155,16 @@ class Entry:
 		return self._driver
 
 	def kill_driver(self):
-		if self._driver:
-			self._driver.quit()
-			self.log("Driver destroyed",True)
-		else:
-			self.log("Error driver doesn't exist")
-		return
+		try:
+			if self._driver:
+				self._driver.quit()
+				self.log("Driver destroyed",True)
+			else:
+				self.log("Error driver doesn't exist")
+		except:
+			pass
+		finally:
+			return
 
 	def log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine{}.log")):
 		file = file.format(self.ip)

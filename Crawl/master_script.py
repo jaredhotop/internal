@@ -12,13 +12,13 @@ server.starttls()
 server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
 Q = Queue.Queue()
 
- def aggr_uwritten():
-     for file in os.listdir("/media/WebCrawl/unwritten"):
-     if file.endswith(".csv") and 'master' not in file:
-        with open(os.path.join("/media/WebCrawl/unwritten/",file),"r") as in_f:
-            read = csv.reader(in_f , delimiter=",")
-            for row in read:
-                Q.put(row)
+def aggr_uwritten():
+    for file in os.listdir("/media/WebCrawl/unwritten"):
+        if file.endswith(".csv") and 'master' not in file:
+            with open(os.path.join("/media/WebCrawl/unwritten/",file),"r") as in_f:
+                read = csv.reader(in_f , delimiter=",")
+                for row in read:
+                    Q.put(row)
     with open("/media/WebCrawl/unwritten_master.csv","w") as out_f:
         write = csv.writer(out_f,delimiter = ",")
         while not Q.empty():
@@ -26,7 +26,7 @@ Q = Queue.Queue()
 
 def aggr_valid_records():
     for file in os.listdir("/media/WebCrawl/outputs"):
-         if file.endswith(".csv") and 'master' not in file:
+        if file.endswith(".csv") and 'master' not in file:
             with open(os.path.join("/media/WebCrawl/outputs",file),"r") as in_f:
                 read = csv.reader(in_f , delimiter=",")
                 for row in read:

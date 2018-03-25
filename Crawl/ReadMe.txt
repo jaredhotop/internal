@@ -1,4 +1,4 @@
-Documentation for Web Crawler
+#Documentation for Web Crawler
 #
 #Written by: Jayson Scruggs
 #Property of Buchheit
@@ -42,7 +42,7 @@ Adding competitors:
 
     Location based competitors:
 
-    to acquire pricing data on a location basis more information must be given to the pricing function. If there is
+    To acquire pricing data on a location basis, more information must be given to the pricing function. If there is
     more than one comp id for this competitor, start by creating an if block above the dictionaries we made earlier.
         if obj.comp_id == <comp id number>
             loc_ins = "<special instructions go here>"
@@ -59,12 +59,91 @@ Adding competitors:
     /* avoided if at all possible. Ideally loc_ins = "loc_data.<comp func name>(obj,<zipCode or store id>)"      */
 
 
-    Lastly a function should be defined in loc_data.py to receive the instructions. This can be trick as this function
+    Lastly a function should be defined in loc_data.py to receive the instructions. This can be tricky as this function
     will probably heavily rely on selenium. Helpful hints:
 
-    --> After declaring your function assign driver = obj._driver to make copied code work mostly out of the box
+    --> After declaring your function assign driver = obj._driver to make copied and pasted code work mostly out of the box
 
     --> Use: "WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "<css id>"))) " to wait for an element to be present on the page
 
     --> Use: "WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "<css id>")))" to wait for an element to be visible
+
+    --> More detailed information can be found in the selenium documentation: http://selenium-python.readthedocs.io/
 Methods:
+
+    This is a brief overview of helpful functions that abstract away the use of selenium functions and required logic for creating valid output
+    This will not cover all the functions that exist
+
+    pricing(price_dict,sale_dict = None,broken_dict = None,loc_ins = None):
+        This is the main method you should use. It will retrieve the selectors given to it and extract the value of the specified attribute.
+        It will do this for both price and sales price. It will check for the presence of an attribute in the given selector for broken links.
+        It also has the ability to execute strings of commands that are passed it. This allows for greater flexibility but also presents a risk
+        that bad commands can create problems. This ability should be used with care.
+        **This method creates the webdriver and puts the URL. It should be called before any method relying on the driver.
+
+        The parameters you must pass:
+          A dictionary of pricing css selectors as keys and corresponding attributes as values
+
+        The parameters you can pass:
+          A dictionary of sales pricing selectors as keys and corresponding attributes as values
+          A dictionary of broken link css selectors as keys and corresponding attributes as values. Additionally text you would like to validate appears
+            within the pulled attribute can be appended by concatenating the attribute + '|||' + text. i.e. "innerHTML|||Unavailable"
+            *Note the text appended in this way is case sensitive
+          A string or docstring containing lines of code to be executed. These commands are executed after driver creation but before the URL is pulled.
+
+        Order of operations:
+          Driver creation
+          special instructions execution
+          URL pulled
+          Pricing data retrieved
+          sales data retrieved
+          broken links flagged
+
+        Returned values:
+          None
+
+        Set values:
+          _driver
+          shop_date
+          comp_price
+          comp_sale_price
+          _broken_flag
+
+    _find_data(select,value):
+        This method is primarily used by the pricing method to identify broken links. It is useful for identifying if something exist on the page.
+        This method returns a boolean True or False indicating whether the conditions were found or not.
+
+        The parameters you must pass:
+          A css selector as a string.
+
+        The parameters you can pass:
+          An attribute to be found on the css selector, if this is not specified it will default to innerHTML
+          A string to be checked whether or not it appears in the checked attribute.
+          *These conditions should be passed together by concatenating the attribute + '|||' + text. i.e. "innerHTML|||Unavailable"
+
+        Example use:
+            obj._find_data("span#price","innerHTML|||In Stock")
+
+        Returned Values:
+          Boolean - True if the selector and attribute are found (and the value specified is matched)
+
+    _retrieve_data(selector, value):
+        This function pulls the specified selector and attribute and returns the data within. This is useful for retrieving a value or grabbing an
+        object of the page for selenium manipulation without needing to invoke selenium directly.
+
+      Parameters you must pass:
+        A css selector as a string
+
+      Parameters you can pass:
+        An attribute to be found on the css selector, if this is not specified then the object referenced by the selector will be Returned
+
+      Example use:
+          obj._retrieve_data("span#price","innerText")
+
+      Returned Values:
+        Given an attribute:
+          value of the attribute - if attribute is found.
+          empty string - if attribute is not found
+        Given only selector:
+          The selenium object referenced by selector - if selector is found
+          empty string - if selector is invalid

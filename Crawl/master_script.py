@@ -19,7 +19,7 @@ def aggr_uwritten():
                 read = csv.reader(in_f , delimiter=",")
                 for row in read:
                     Q.put(row)
-    with open("/media/WebCrawl/unwritten_master.csv","w") as out_f:
+    with open("/media/WebCrawl/unwritten/unwritten_master.csv","w") as out_f:
         write = csv.writer(out_f,delimiter = ",")
         while not Q.empty():
             write.writerow(Q.get())

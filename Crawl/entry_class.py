@@ -139,12 +139,6 @@ class Entry:
         self._defined = False
         return
 
-    def _get_broken(self):
-        return True if self._broken_flag else False
-
-    def _get_price(self):
-        return self.comp_price
-
     def _create_driver(self):
         firefox_options = Options()
         firefox_options.add_argument("--headless")

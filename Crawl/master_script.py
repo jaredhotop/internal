@@ -6,6 +6,8 @@ import csv
 import Queue
 from email.mime.text import MIMEText as Etext
 import smtplib
+import traceback
+import shutil
 
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()
@@ -31,6 +33,7 @@ def aggr_valid_records():
                 read = csv.reader(in_f , delimiter=",")
                 for row in read:
                     Q.put(row)
+            shutil.move("/media/WebCrawl/outputs/{}".format(file),os.path.expanduser("/media/WebCrawl/logs/"))
     with open("/media/WebCrawl/outputs/valid_records_master.csv","w") as out_f:
         write = csv.writer(out_f,delimiter = ",")
         while not Q.empty():
@@ -38,12 +41,14 @@ def aggr_valid_records():
 try:
     aggr_uwritten()
 except:
+    raise
     msg =Etext("Master failed to aggregate unwritten:\n{}".format(traceback.format_exc()))
     msg['Subject'] = "Master Failed to Aggregate Unwritten"
     server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
 try:
     aggr_valid_records()
 except:
+    raise
     msg =Etext("Master failed to aggregate valid records:\n{}".format(traceback.format_exc()))
     msg['Subject'] = "Master Failed to Aggreagate Valid Records"
     server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())

@@ -63,7 +63,7 @@ def __repr__(self):
           instance of the Entry class
 
       Returned value:
-          a line that could be copied and pasted to create the instance over again.
+          A line that could be copied and pasted to create the instance over again.
 
       Set values:
           None
@@ -72,4 +72,347 @@ def __repr__(self):
           print(__repr__(obj))
 
 def __str__(self):
-      A more user friendly representation of the object
+      A more user friendly representation of the object. This is implicitly called when the
+      string version of an object is invoked
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          A readable synopsis of the object
+
+      Set values:
+          None
+
+      Example use:
+          print(obj)
+
+def write_entry(self,file):
+      This method is used to write the information contained in a class instance. A series of checks of recorded
+      data determines whether a file is written to the file specified or to the default unwritten location. The data
+      is pulled by invoking _data_tup() as a way of maintaining conciseness.
+
+      Parameters:
+          instance of the class
+          filepath for valid data
+
+      Returned value:
+          None
+
+      Set values:
+          None
+
+      Example use:
+          obj.write_entry(os.path.expanduser('~/Documents/filename.csv'))
+
+def _data_tup(self):
+      This method returns a tuple of all the values to be printed by write_entry(). The order of this tuple is the order
+      the values will be printed in.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          Tuple of significant data attributes
+
+      Set values:
+          None
+
+      Example use:
+          #Not recommended for use on its own
+          print(obj._data_tup())
+
+def set_price(self,price):
+      Determines if a value is a valid number and then sets the comp_price attribute equal to the value. logs the action.
+      This method does no cleaning and will reject any value not an integer, long, or float.
+      Parameters:
+          instance of the class
+          price
+
+      Returned value:
+          None
+
+      Set values:
+          comp_price
+
+      Example use:
+          #Not recommended for use on its own. Use the pricing() method instead.
+          obj.set_price("9.55")
+
+def set_sale_price(self,price):
+      This method is nearly identical to the set_price() method. The only distinction is that the value is assigned to the
+      sale price attribute.
+
+      Parameters:
+          instance of the class
+          price
+
+      Returned value:
+          None
+
+      Set values:
+          comp_sale_price
+
+      Example use:
+          #Not recommended for use on its own. Use the pricing() method instead.
+          obj.set_sale_price("12.45")
+
+def set_shop_date(self):
+      This method sets the shop_date attribute to the current date and time. Equivalent to setting the values manually.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          None
+
+      Set values:
+          shop_date
+
+      Example use:
+          #Not recommended for use on its own. Use the pricing() method instead.
+          obj.set_shop_date()
+
+def set_third_party(self,bool_val = True):
+      This method sets the comp_shop_third_party and comp_match_id attribute then logs the action.
+      The default for this method is setting third party to True. It will accept False but this does not reset the
+      comp_match_id value.
+
+      Parameters:
+          instance of the class
+          bool_val - The value to set comp_shop_third_party to. //default is True
+
+      Return value:
+          None
+
+      Set values:
+          comp_shop_third_party
+          comp_match_id
+
+      Example use:
+          if {condition to determine if link is third party}:
+              obj.set_third_party()
+
+def set_out_of_stock(self):
+      This method sets the comp_shop_out_of_stock attribute to True. It is equivalent to setting the value manually and logging the action.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          None
+
+      Set values:
+          comp_shop_out_of_stock
+
+      Example use:
+          if {condition to check if link out of stock}:
+              obj.set_out_of_stock()
+
+def set_unique_id(self):
+      This method applies a correction to the unique id by appending a 1. The action is then logged.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          None
+
+      Set values:
+          unique_id
+
+      Example use:
+          #This example alters obj_1.unique_id from 'XXXXXXXX' to 'XXXXXXXX1'
+          if obj_1.unique_id == obj_2.unique_id:
+              obj_1.set_unique_id()
+
+def set_undefined(self):
+      This method sets the _defined = False. Equivalent to setting the value manually. This Method exist explicitly to keep the value of _defined
+      from being assigned to anything other than True or False.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          None
+
+      Set values:
+          _defined
+
+      Example use:
+          def competitor(obj): #Placeholder function
+              #This function to be defined at a later date
+              obj.set_undefined()
+
+def _create_driver(self):
+      This method creates a firefox webdriver in headless mode, assigns the value to the _driver attribute, logs the action and returns the driver.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          _driver = {newly created webdriver}
+
+      Set values:
+          _driver
+
+      Example use:
+          #Not recommended for use on its own. Use the pricing() method instead
+          obj._create_driver()
+
+def kill_driver(self):
+      This method will properly terminate the selenium webdriver and log the action. This method should be used after calling _create_driver() or pricing()
+      to avoid locking up memory.
+
+      Parameters:
+          instance of the class
+
+      Returned value:
+          None
+
+      Set values:
+          #The webdriver object contained in the _driver attribute is modified but not set to a different value
+
+      Example use:
+          #_create_driver() and _retrieve_data() are used to better illustrate the point, however in practice the pricing function should be used.
+          obj._create_driver()
+          print(obj._retrieve_data("span#price","innerHTML"))
+          obj.kill_driver()
+
+def log(self, log_msg, print_only = False, file = os.path.expanduser("/media/WebCrawl/logs/machine{}.log")):
+      This method is responsible for creating the log files and console log output. It will accept an alternate log file as input, however the default is
+      to log to the WebCrawl folder on 116. The Boolean print_only can be set to True to turn ensure a message will not be logged to file. As a general
+      rule only data that could be used to determine an error should be logged.
+
+      Parameters:
+          instance of the class
+          log_msg - A string to be logged
+          print_only - A boolean that determines whether the message is written to file in addition to the console. //Default is to log to file
+          file - Alternate filepath to log to. //Default path is /media/WebCrawl/logs/machine{ip of the machine}.log
+
+      Returned value:
+          None
+
+      Set values:
+          _log_msg - All log messages are appended to this attribute and can be printed as a single block though this functionality isn't currently in use
+
+      Example use:
+          if {condition}:
+              #some code
+          else:
+              #The following will log the message "Some error has occurred" to the console without logging to file
+              obj.log("Some error has occurred",True)
+
+def _retrieve_data(self,selector,value = None):
+      This method is an abstraction of the selenium find_element_by_css_selector() method. It allows for the flexible use of this feature without knowledge
+      of selenium. It will accept either a css selector or a css selector and a value. If only the selector is supplied then the return value will be the selenium
+      object associated with that selector. This is useful if that object will be needed for selenium functions. Specifying both selector and value will return a
+      string with the data associated with the value, encoded with utf-8. if a selector or value given is not found an empty string will be returned.
+      *This method does no cleaning of the data. The clean function in the aux_func file can be used to reduce the output to the first available numerical value.
+      **This is done automatically in the pricing function with should be used when retrieving pricing information.
+
+      Parameters:
+          instance of the class
+          selector - a css selector
+          value - attribute to retrieve (i.e innerHTML, innerText, name, etc.)
+
+      Returned value:
+          selenium object - If a valid css selector is given with no associated value to pull
+          utf-8 string - If valid css selector and values are given
+          empty string - If invalid css selector or values are given
+
+      Set values:
+          None
+
+      Example use:
+          Product_name = obj._retrieve_data("div.product > h2","innerText")
+
+def _find_data(self,select,value = 'innerHTML'):
+      This method is used to check if an element exist on the page. This is usefully when checking if a link should be marked out of stock or as third party.
+      Similar to _retrieve_data() this method can take a css selector alone or paired with a value, however it can also check if a certain string exist in the
+      value found. This is achieved by concatenating ||| to the attribute value followed by the string to check.
+
+      Parameters:
+          instance of the class
+          select - css selector
+          value - defaults to innerHTML
+          *or value - attribute and search string concatenation. (attribute|||search_string)
+
+      Returned value:
+          Boolean - True if element/attribute exist or search string was found in attribute. False if not found or search string was not found in the attribute
+
+      Set values:
+          None
+
+      Example use:
+          if obj._find_data("span#quantity","innerHTML||| 0 ")
+              #code
+          if obj._find_data("span#error","innerText")
+              #code
+
+def pricing(self,price_dict,sale_dict = None, broken_dict = None, loc_ins = None):
+      This method is the most useful one provided. It serves to combine several methods to cleanly condense the process of finding and identifying prices, sale prices,
+      and broken links as well as creating the driver, setting the shop date and providing a flexible component for adapting the function as the need arises. These
+      actions are logged as they occur if applicable.
+
+          This method is employed by passing a series of dictionaries (in essence a list of key:value pairs). These must include a dictionary of css selectors
+      relating to the price of the link as keys and the corresponding attribute as values. Optionally it can receive a dictionary for sale price structured in the same way.
+      It may also receive a dictionary for broken links, however this dictionary is processed using _find_data(). This means that the values used in this dictionary may also
+      use the ||| concatenation to check that a particular string appears in the value of the attribute. The final optional argument is a different kind all together. This
+      parameter is a string or docstring containing python code that will be evaluated when the pricing method is executed, after driver creation but before the instance's
+      url is retrieved (the order of execution is described in the annotation below).
+
+          An important note when creating dictionaries is that this method will evaluate the selectors in ascending order from 0 and stop when it finds a valid data point.
+      What that means for those writing these dictionaries is that the order of selectors is important. It should be considered what the comp_price need be when an item is
+      on sale as well as under normal conditions as these may cause conflicts when attempting to set a sale price as well. Because in many sites the sale price will be
+      in the same element as a normal price would be when not on sale there is likely to be overlap in the dictionaries. This case is handled by giving the comp_price priority
+      when the values would be the same, comp_sale_price will then be set to 0.0.
+
+          Another note of importance is that the prices found in this method are automatically cleaned using the clean function in aux_func
+
+      *This method is executed in a very specific order that is worth bearing in mind when extending its function beyond the basic provisions. That order is:
+          driver creation
+          adaptive instructions - anything passed through loc_ins
+          retrieve the page
+          set pagedata
+          set comp_shop_date
+          set comp_price
+          set comp_sale_price
+          check for broken link values
+
+      Parameters:
+          instance of the class
+          price_dict - a dictionary containing css selector keys and attribute values
+          sale_dict  - a dictionary containing css selector keys and attribute values
+          broken_dict- a dictionary containing css selector keys and attribute values with the option to append a search string to the attribute
+          loc_ins - a string or docstring containing python code to be executed after driver creation but before link retrieval
+
+      Returned value:
+          None
+
+      Set values:
+          _driver
+          pagedata
+          comp_shop_date
+          comp_price
+          comp_sale_price
+          _broken_flag
+
+      Example use:
+          price_dictionary = {"span#was-price":"innerHTML", "span#price":"innerText"}
+          sale_price_dictionary = {"span#price":"innerText"}
+          broken_dictionary = {"h1.error_msg":"innerHTML|||sorry"}
+          locoation_instructions = "another_file.function(self._driver,'90210')"
+
+          obj.pricing(price_dictionary,sale_price_dictionary,broken_dictionary,locoation_instructions)
+
+          # This code does a few things worthy of note:
+          # 1) The pricing dictionary looks at the sale case first. This is because as we see looking at the sales dictionary the element for a normal price
+          # still exist for a sale but no longer contains the value we want.
+          # 2) Similar to the first point, our sales dictionary contains the same selector as our pricing dictionary. That means in the normal case these will
+          # find the same price. The pricing method resolves this by allowing comp_price to remain while assigning comp_sale_price to 0.0
+          # 3) The broken dictionary takes advantage of the search ability of _find_data() to look for the word sorry in the innerHTML of the error message
+          # 4) The location instructions contain a string of python code (This code executes a function in another file passing the driver, that we anticipate
+          # the pricing() method creating, and a zipcode) that hasn't been evaluated. This will be evaluated after the driver is created. We need to be confident
+          # in these instructions because python won't throw an error when we start it up if they are invalid and if these instructions turn out to do something
+          # wrong it is much harder to locate this string than another line of code. You should NEVER pass user input to this method in this way.

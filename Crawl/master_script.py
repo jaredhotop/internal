@@ -33,7 +33,8 @@ def aggr_valid_records():
                 read = csv.reader(in_f , delimiter=",")
                 for row in read:
                     Q.put(row)
-            shutil.move("/media/WebCrawl/outputs/{}".format(file),os.path.expanduser("/media/WebCrawl/logs/"))
+            shutil.copy("/media/WebCrawl/outputs/{}".format(file),os.path.expanduser("/media/WebCrawl/logs/"))
+            os.remove("/media/WebCrawl/outputs/{}".format(file))
     with open("/media/WebCrawl/outputs/valid_records_master.csv","w") as out_f:
         write = csv.writer(out_f,delimiter = ",")
         while not Q.empty():

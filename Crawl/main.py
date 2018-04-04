@@ -25,6 +25,8 @@ ip = aux_func.get_ip().split(".")
 try:
     os.remove(os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
     os.remove(os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
+    shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
+    shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
 except:
     print("Failed to delete previous files!")
     # server = smtplib.SMTP('smtp.gmail.com',587)
@@ -70,8 +72,23 @@ except:
         raise
 finally:
     try:
-        shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
-        shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
-    except IOError:
-        pass
-    print("Crawl Complete")
+        try:
+            shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
+        except IOError:
+            pass
+        try:
+            shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
+        except IOError:
+            pass
+        print("Crawl Complete")
+    except:
+        if email_crash_report:
+            server = smtplib.SMTP('smtp.gmail.com',587)
+            server.starttls()
+            server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+            msg =Etext("Failed to move files on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
+            msg['Subject']
+            server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+            server.quit()
+        else:
+            raise

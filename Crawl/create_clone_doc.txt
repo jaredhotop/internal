@@ -1,0 +1,51 @@
+#How to spin-up a clone for web-crawl
+#Written by: Jayson scruggs
+
+
+Creating a clone will require access to the server through a desktop client.
+
+To create a clone, login in through the client.
+
+  1. Select the host
+  2. Select the summary tab in the main pane
+  3. Right-click datastore1
+  4. Select browse datastore
+  5. Click the create new folder button and name your folder appropriately {preferably by ip address}
+  6. Enter the clone folder and copy the .vmx and .vmdk files {you will need to right-click to do this}
+  7. Paste these files into the folder you created {again you will need to right-click}
+  8. right-click the .vmx file and add to inventory {this will take a minute}
+  9. Power on the machine and at the prompt select "I copied it" {This may work best in the web-client}
+
+
+To setup the machine for web-crawl use:
+  0. launch the machine with a vsphere client
+#Internet connection
+  1. Select the connections icon from the taskbar and click edit connections
+  2. Edit connection 3
+  3. Edit ipv4 connections
+  4. Set to method to manual
+  5. Give your machine a unique ip in the form :10.0.14.xxx
+  6. fill in the remaining data as is standard for our network
+      -subnet
+      -gateway
+      -dns servers
+  7. click save
+#Software updates
+  8. Once a connection has been made take the updates available
+      if the update pop-up is available simply click through the prompts else use step 9
+  9. click the start menu -> System Tools -> Software Updater and follow the prompts to install
+  10. restart the machine when finished
+#Change hostname
+  11. launch a terminal {start menu -> System Tools -> LXTerminal}
+  12. enter the command "sudo leafpad /etc/hostname"
+  13. Change the text to an appropriate hostname {crawler-[last ip segment]}
+  14. Save and close leafpad
+  15. Enter the command "sudo leafpad /etc/hosts"
+  16. change the text "original-vm" to the same hostname as above
+  17. Save and close leafpad
+#start vnc server {This will have to be done every time the machine is started}
+  18. launch X11VNCserver {start menu -> internet -> x11VNCserver}
+  19. Verify the port is 5900 and check "tightvnc"
+  20. click okay.
+  21. check accept connection and enter the standard vnc password
+  22. click apply and okay.

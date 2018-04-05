@@ -20,15 +20,17 @@ except:
 import time
 
 
+
+
 me = singleton.SingleInstance()
 ip = aux_func.get_ip().split(".")
-try:
-    os.remove(os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
-    os.remove(os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
-    shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
-    shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
-except:
-    print("Failed to delete previous files!")
+def append_to_log(message,file = os.path.expanduser('/media/WebCrawl/logs/machine{}'.format(ip[3]))):
+    print(message)
+    with open(file, 'a') as f:
+        f.write(message)
+    return
+
+
     # server = smtplib.SMTP('smtp.gmail.com',587)
     # server.starttls()
     # server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
@@ -72,14 +74,31 @@ except:
         raise
 finally:
     try:
+        if os.path.exists("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]):
+            os.remove(os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
+        if os.path.exists("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]):
+            os.remove(os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
+        if os.path.exists("/media/WebCrawl/logs/machine%s.log" %ip[3]):
+            os.remove(os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
+    except:
+        append_to_log("Failed to delete previous files!")
+    try:
         try:
-            shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
+            if os.path.exists(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3])):
+                shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
         except IOError:
+            append_to_log('Failed to move Valid records.')
             pass
         try:
-            shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
+            if os.path.exists(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3])):
+                shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
         except IOError:
+            append_to_log('Failed to move unwritten.')
             pass
+        try:
+            shutil.move(os.path.expanduser("~/Documents/machine%s.log" %ip[3]),os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
+        except:
+            append_to_log('Failed to move log file')
         print("Crawl Complete")
     except:
         if email_crash_report:

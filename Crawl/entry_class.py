@@ -160,7 +160,7 @@ class Entry:
         finally:
             return
 
-    def log(self,log_msg,print_only = False,file= os.path.expanduser("/media/WebCrawl/logs/machine{}.log")):
+    def log(self,log_msg,print_only = False,file= os.path.expanduser("~/Documents/machine{}.log")):
         file = file.format(self.ip)
         self._log_msg = self._log_msg + " \n" + log_msg
         now = datetime.now()

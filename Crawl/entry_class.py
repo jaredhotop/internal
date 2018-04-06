@@ -80,12 +80,12 @@ class Entry:
                 out = csv.writer(f, delimiter = ",")
                 out.writerow(self._data_tup())
         elif self._broken_flag:
-            self.log("Link flagged as broken, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
+            self.log("Link flagged as broken,Price: {},{}".format(self.comp_price,self.url),False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
         elif not self._defined:
-            self.log("Competitor Undefined, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
+            self.log("Competitor Undefined,Price: {},{}".format(self.comp_price,self.url),False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
         else:
             self.log("Entry not valid. Writing to alternate file.")
-            self.log("Closer inspection needed, %s" %self.url,False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
+            self.log("Closer inspection needed,Price: {},{}".format(self.comp_price,self.url),False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
         return
 
 

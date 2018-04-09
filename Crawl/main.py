@@ -98,6 +98,12 @@ finally:
             shutil.move(os.path.expanduser("~/Documents/machine%s.log" %ip[3]),os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
         except:
             append_to_log('Failed to move log file')
+        try:
+            for file in os.listdir('/tmp'):
+                if 'tmpaddon' in file:
+                    os.remove(file)
+        except:
+            append_to_log('Error deleting temp files')
         print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))
     except:
         if email_crash_report:

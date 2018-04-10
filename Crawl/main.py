@@ -101,7 +101,7 @@ finally:
         try:
             for file in os.listdir('/tmp'):
                 if 'tmpaddon' in file:
-                    os.remove(file)
+                    os.remove('/tmp/{}'.format(file))
         except:
             append_to_log('Error deleting temp files')
         print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))

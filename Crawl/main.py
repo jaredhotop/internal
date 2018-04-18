@@ -9,6 +9,7 @@ import smtplib
 import sys
 import shutil
 import traceback
+from datetime import datetime
 from tendo import singleton
 from email.mime.text import MIMEText as Etext
 sys.path.append( os.path.expanduser("~/Documents"))
@@ -31,13 +32,11 @@ def append_to_log(message,file = os.path.expanduser('/media/WebCrawl/logs/machin
     return
 
 
-    # server = smtplib.SMTP('smtp.gmail.com',587)
-    # server.starttls()
-    # server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
-    # msg =Etext("Script Failed to delete previous files on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
-    # msg['Subject'] = "Crawl Error"
-    # server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
-    # server.quit()
+try:
+    with open(os.path.expanduser("~/Documents/run.log"),'a') as f:
+        f.write("{}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+except:
+    print("Crawl failed to log start time")
 
 try:
     file_name = os.path.expanduser("/media/WebCrawl/inputs/price_shop_%s.csv" %ip[3])
@@ -99,7 +98,13 @@ finally:
             shutil.move(os.path.expanduser("~/Documents/machine%s.log" %ip[3]),os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
         except:
             append_to_log('Failed to move log file')
-        print("Crawl Complete")
+        try:
+            for file in os.listdir('/tmp'):
+                if 'tmpaddon' in file:
+                    os.remove('/tmp/{}'.format(file))
+        except:
+            append_to_log('Error deleting temp files')
+        print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))
     except:
         if email_crash_report:
             server = smtplib.SMTP('smtp.gmail.com',587)

@@ -21,14 +21,23 @@ except:
 import time
 
 
-
-
 me = singleton.SingleInstance()
+
+
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+
+
 ip = aux_func.get_ip().split(".")
-def append_to_log(message,file = os.path.expanduser('/media/WebCrawl/logs/machine{}'.format(ip[3]))):
+def append_to_log(message,err=None,file = os.path.expanduser('~/Documents/run.log'),email=True):
     print(message)
     with open(file, 'a') as f:
         f.write(message)
+    if email:
+        msg =Etext("{}\n Machine-{}\n\n{}".format(message,ip[3],err))
+        msg['Subject'] = "Machine-{}".format(ip[3])
+        server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
     return
 
 
@@ -80,36 +89,37 @@ finally:
         if os.path.exists("/media/WebCrawl/logs/machine%s.log" %ip[3]):
             os.remove(os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
     except:
-        append_to_log("Failed to delete previous files!")
+        err = traceback.format_exc()
+        append_to_log("Failed to delete previous files!",err = err)
     try:
         try:
             if os.path.exists(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3])):
                 shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
-        except IOError:
-            append_to_log('Failed to move Valid records.')
-            pass
+        except:
+            err = traceback.format_exc()
+            append_to_log('Failed to move Valid records.',err = err)
         try:
             if os.path.exists(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3])):
                 shutil.move(os.path.expanduser("~/Documents/unwritten_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/unwritten/unwritten_%s.csv" %ip[3]))
-        except IOError:
-            append_to_log('Failed to move unwritten.')
-            pass
+        except:
+            err = traceback.format_exc()
+            append_to_log('Failed to move unwritten.',err = err)
         try:
             shutil.move(os.path.expanduser("~/Documents/machine%s.log" %ip[3]),os.path.expanduser("/media/WebCrawl/logs/machine%s.log" %ip[3]))
         except:
-            append_to_log('Failed to move log file')
+            err = traceback.format_exc()
+            append_to_log('Failed to move log file.',err = err)
         try:
             for file in os.listdir('/tmp'):
                 if 'tmpaddon' in file:
                     os.remove('/tmp/{}'.format(file))
         except:
-            append_to_log('Error deleting temp files')
+            err = traceback.format_exc()
+            append_to_log('Error deleting temp files.',err = err)
+        server.quit()
         print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))
     except:
         if email_crash_report:
-            server = smtplib.SMTP('smtp.gmail.com',587)
-            server.starttls()
-            server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
             msg =Etext("Failed to move files on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
             msg['Subject']
             server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())

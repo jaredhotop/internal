@@ -224,7 +224,8 @@ def menards(obj):
     "span#totalItemPriceFloater" : "innerHTML",
     "span.finalPriceSpan.leftFloat":"innerText" }
     sale_selectors = {"span.bargainPrice" : "innerHTML", \
-    "span#totalItemPriceFloater" : "innerHTML"}
+    "span#totalItemPriceFloater" : "innerHTML",
+    "span.finalPriceSpan.leftFloat":"innerText"}
     broken_link_selectors = {"h3.resettitle":"innerHTML"}
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
@@ -368,6 +369,8 @@ def walmart(obj):
                     if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
                         obj.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
                         break
+                else:
+                    obj.set_third_party()
         elif not obj._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
             obj.set_third_party()
 

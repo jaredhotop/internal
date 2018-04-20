@@ -143,7 +143,7 @@ class Entry:
         firefox_options = Options()
         firefox_options.add_argument("--headless")
         # chrome_options.add_argument("--disable-gpu")
-        # firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
+        firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
         self._driver = webdriver.Firefox(executable_path = os.path.expanduser('~/bin/geckodriver'),firefox_options = firefox_options)
         self.log("Driver created",True)
         return self._driver
@@ -218,6 +218,9 @@ class Entry:
                             continue
                         else:
                             break
+                    else:
+                        self.log('Location specific instructions execution failed')
+                        return ValueError('Location specific instructions execution failed')
                 driver.get(str(self.url))
                 if self.comp_id == 12 or self.comp_id == 70:
                     time.sleep(5)

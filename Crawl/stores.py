@@ -185,13 +185,13 @@ def home_depot(obj):
 
 def lowes(obj):
     if obj.comp_id == 6:
-        loc_ins = "loc_data.lowes(self,63028)"
+        loc_ins = "loc_data.lowes(self,63028,'Festus')"
     elif obj.comp_id == 15:
-        loc_ins = "loc_data.lowes(self,63701)"
+        loc_ins = "loc_data.lowes(self,63701,'Cape Girardeau')"
     elif obj.comp_id == 16:
-        loc_ins = "loc_data.lowes(self,62704)"
+        loc_ins = "loc_data.lowes(self,62704,'Springfield')"
     elif obj.comp_id == 24:
-        loc_ins = "loc_data.lowes(self,62221)"
+        loc_ins = "loc_data.lowes(self,62221,'Belleville')"
     price_selectors = {"input[name=productId]":"data-productprice","span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
     "span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
     sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
@@ -200,6 +200,7 @@ def lowes(obj):
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
     except:
+        raise
         obj.log("Failed to acquire pricing data")
     #Out of stock check
     try:

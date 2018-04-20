@@ -25,7 +25,7 @@ def tsc(obj,store):
     driver.get(obj.url)
     return driver
 
-def lowes(obj,store):
+def lowes(obj,store,check_value):
     driver = obj._driver
     driver.get("https://www.lowes.com/")
     try:
@@ -37,8 +37,11 @@ def lowes(obj,store):
     driver.find_element_by_id("search-box").send_keys(store,Keys.ENTER)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "js-store-locator-select-store")))
     driver.find_element_by_class_name("js-store-locator-select-store").click()
-    # driver.get_screenshot_as_file(os.path.expanduser("~/Documents/%s.png"%obj.sku))
-    return driver
+    if check_value in obj._retrieve_data("div.store-name > a","innerText"):
+        return driver
+    else:
+        raise ValueError('The location has been set wrong.')
+
 
 def home_depot(obj,store):
     driver = obj._driver

@@ -75,7 +75,7 @@ except:
         server.starttls()
         server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
         msg =Etext("Script Failed on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
-        msg['Subject']
+        msg['Subject'] = "Generic Script Failure"
         server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
         server.quit()
     else:
@@ -120,8 +120,11 @@ finally:
         print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))
     except:
         if email_crash_report:
+            server = smtplib.SMTP('smtp.gmail.com',587)
+            server.starttls()
+            server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
             msg =Etext("Failed to move files on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
-            msg['Subject']
+            msg['Subject'] = "Failed File Movement"
             server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
             server.quit()
         else:

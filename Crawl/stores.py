@@ -295,7 +295,7 @@ def ruralking(obj):
     price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content",}
     #"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
     sale_selectors = {"":""}
-    broken_link_selectors = {"div.page-head-alt >h3":"innerHTML|||Sorry"}
+    broken_link_selectors = {"div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
     except:

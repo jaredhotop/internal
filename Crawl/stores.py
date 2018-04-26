@@ -132,6 +132,25 @@ def cabela(obj):
         obj.kill_driver()
     return
 
+def Chewy(obj):
+    price_selectors = {"span.ga-eec__price" : "innerHTML",}
+    sale_selectors = {"p.autoship-pricing" : "innerHTML"}
+    broken_link_selectors = {"":""}
+    try:
+        obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
+    except:
+        raise
+        obj.log("Failed to acquire pricing data")
+    #No third party
+    try:
+        if obj._find_data("div#availability span.unavailable"):
+            obj.set_out_of_stock()
+    except:
+        obj.log("Out of Stock check failed")
+    finally:
+        obj.kill_driver()
+    return
+
 def dickeybub(obj):
     price_selectors = {"p.price > del > span.woocommerce-Price-amount.amount" : "innerHTML",\
     "p.price > span.woocommerce-Price-amount.amount" : "innerHTML",}
@@ -273,8 +292,8 @@ def petsense(obj):
     return
 
 def ruralking(obj):
-    price_selectors = {"div.price-box > span.regular-price > span.price":"innerHTML",\
-    "span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
+    price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content",}
+    #"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
     sale_selectors = {"":""}
     broken_link_selectors = {"div.page-head-alt >h3":"innerHTML|||Sorry"}
     try:

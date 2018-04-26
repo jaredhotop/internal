@@ -12,34 +12,54 @@ import traceback
 from datetime import datetime
 from tendo import singleton
 from email.mime.text import MIMEText as Etext
+import requests
+
+
+
+test_mach = 0
+email_crash_report = 1
 sys.path.append( os.path.expanduser("~/Documents"))
 try:
     from crawlconfig import *
 except:
-    test_mach = 0
-    email_crash_report = 1
-import time
+    pass
 
 
-me = singleton.SingleInstance()
 
+def status_post(status):
+    try:
+        r = requests.post("http://10.0.5.201:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+    except:
+        print("Failed to post to Jon's server")
+    try:
+        r = requests.post("http://10.0.10.19:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+    except:
+        print("Failed to post to Dawn's server")
+    try:
+        r = requests.post("http://10.0.10.246:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+    except:
+        print("Failed to post to Jayson's server")
 
-server = smtplib.SMTP('smtp.gmail.com',587)
-server.starttls()
-server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
-
-
-ip = aux_func.get_ip().split(".")
 def append_to_log(message,err=None,file = os.path.expanduser('~/Documents/run.log'),email=True):
     print(message)
     with open(file, 'a') as f:
         f.write(message)
-    if email:
-        msg =Etext("{}\n Machine-{}\n\n{}".format(message,ip[3],err))
-        msg['Subject'] = "Machine-{}".format(ip[3])
-        server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+    status_post("Error")
+    if email_crash_report:
+        if email:
+            msg =Etext("{}\n Machine-{}\n\n{}".format(message,ip[3],err))
+            msg['Subject'] = "Machine-{}".format(ip[3])
+            server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
     return
 
+ip = aux_func.get_ip().split(".")
+
+status_post("Started")
+me = singleton.SingleInstance()
+
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
 
 try:
     with open(os.path.expanduser("~/Documents/run.log"),'a') as f:
@@ -92,6 +112,7 @@ finally:
         err = traceback.format_exc()
         append_to_log("Failed to delete previous files!",err = err)
     try:
+        err = False
         try:
             if os.path.exists(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3])):
                 shutil.move(os.path.expanduser("~/Documents/valid_records_%s.csv" %ip[3]),os.path.expanduser("/media/WebCrawl/outputs/valid_records_%s.csv" %ip[3]))
@@ -117,6 +138,8 @@ finally:
             err = traceback.format_exc()
             append_to_log('Error deleting temp files.',err = err)
         server.quit()
+        if not err:
+            status_post("Completed")
         print("Crawl Complete: {}".format(datetime.now().strftime("%m/%d/%Y")))
     except:
         if email_crash_report:
@@ -127,5 +150,3 @@ finally:
             msg['Subject'] = "Failed File Movement"
             server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
             server.quit()
-        else:
-            raise

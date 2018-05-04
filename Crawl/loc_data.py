@@ -88,3 +88,9 @@ def autozone(obj):
             return
         except:
             return
+
+def farm_and_home(obj,store):
+    driver = obj._driver
+    driver.get("http://www.farmandhomesupply.com/company/store-locations/")
+    driver.find_element_by_css_selector("li#code-{} > button".format(store)).click()
+    return

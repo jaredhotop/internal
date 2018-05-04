@@ -164,8 +164,22 @@ def dickeybub(obj):
     return
 
 def farm_and_home(obj):
-    obj.log("Competitor: %d not yet defined" %obj.comp_id)
-    obj.set_undefined()
+    if obj.comp_id == 25:
+        loc_ins = "locdata.farm_and_home(self,10)"
+    elif obj.comp_id == 4:
+        loc_ins = "loc_data.farm_and_home(self,2)"
+
+    price_selectors = {"div.product-main-info > div.price-box > span.regular-price > span.price" : "innerHTML"}
+    sale_selectors = {}
+    broken_link_selectors = {}
+    try:
+        obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+    except:
+        obj.log("Failed to acquire pricing data")
+    finally:
+        obj.kill_driver()
+    #obj.log("Competitor: %d not yet defined" %obj.comp_id)
+    #obj.set_undefined()
     return
 
 def home_depot(obj):
@@ -310,7 +324,6 @@ def ruralking(obj):
     finally:
         obj.kill_driver()
     return
-    # sale css_selector? -> div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline").find_element_by_css_selector("span.Price-group").get_attribute("title"))
 
 def sears(obj):
     price_selectors = {"span.price-wrapper":"innerHTML"}

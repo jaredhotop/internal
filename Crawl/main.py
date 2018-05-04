@@ -28,15 +28,15 @@ except:
 
 def status_post(status):
     try:
-        r = requests.post("http://10.0.5.201:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+        r = requests.post("http://10.0.5.201:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%m/%d %H:%M:%S"))})
     except:
         print("Failed to post to Jon's server")
     try:
-        r = requests.post("http://10.0.10.19:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+        r = requests.post("http://10.0.10.19:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%m/%d %H:%M:%S"))})
     except:
         print("Failed to post to Dawn's server")
     try:
-        r = requests.post("http://10.0.10.246:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%H:%M:%S"))})
+        r = requests.post("http://10.0.10.246:5000",data = {'status':status,'ip':ip[3],'time':'{}'.format(datetime.now().strftime("%m/%d %H:%M:%S"))})
     except:
         print("Failed to post to Jayson's server")
 
@@ -54,8 +54,8 @@ def append_to_log(message,err=None,file = os.path.expanduser('~/Documents/run.lo
 
 ip = aux_func.get_ip().split(".")
 
-status_post("Started")
 me = singleton.SingleInstance()
+status_post("Started")
 
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()

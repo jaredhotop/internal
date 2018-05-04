@@ -11,8 +11,9 @@ def daemon():
             with open(os.path.expanduser("C:/Program Files/crawl_status/current_status.txt"),'r') as inf:
                 data = json.load(inf)
             for entry in data:
-                entry['status'] = "Not Started"
-                entry['time'] = "00:00:00"
+                if entry["status"] != "Started":
+                    entry['status'] = "Not Started"
+                    entry['time'] = "{} 00:00:00".format(datetime.now().strftime("%m/%d"))
             with open(os.path.expanduser("C:/Program Files/crawl_status/current_status.txt"),'w') as outf:
                 json.dump(data,outf)
             time.sleep(36000)

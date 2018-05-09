@@ -71,12 +71,12 @@ for p,value in price_dict.iteritems():
 price_dict[p.format(bpsku)] = price_dict.pop(p)
 for p,value in sale_dict.iteritems():
 sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
-    price_selectors = {"span#listPrice_{}.old_price":"innerHTML",\
+    price_selectors = {"div.top.namePartPriceContainer span[itemprop=price]" : "innerHTML","span#listPrice_{}.old_price":"innerHTML",\
     "span#offerPrice_{} > span":"innerHTML","div[itemprop=offers]>span[itemprop=price]":"content"}
     sale_selectors = {"span#offerPrice_{}.price.sale > span":"innerHTML"}
     broken_link_selectors = {"":""}
     try:
-        obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
+        obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
     except:
         obj.log("Failed to acqure pricing data")
     finally:

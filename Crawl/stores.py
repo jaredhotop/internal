@@ -28,7 +28,10 @@ def academy(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def acehardware(obj):
@@ -40,7 +43,10 @@ def acehardware(obj):
     #No third party
     #No out of stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def autozone(obj):
@@ -61,7 +67,10 @@ def autozone(obj):
         obj.log("out of stock check failed")
 
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def basspro(obj):
@@ -80,7 +89,10 @@ sale_dict[p.format(bpsku)] = sale_dict.pop(p)"""
     except:
         obj.log("Failed to acqure pricing data")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def blain(obj):
@@ -100,7 +112,10 @@ def blain(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def bootbarn(obj):
@@ -115,7 +130,10 @@ def bootbarn(obj):
     #no third Party
     #no out of stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def cabela(obj):
@@ -129,7 +147,10 @@ def cabela(obj):
     except:
         obj.log("Failed to acquire pricing data")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def Chewy(obj):
@@ -148,7 +169,10 @@ def Chewy(obj):
     except:
         obj.log("Out of Stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def dickeybub(obj):
@@ -160,7 +184,10 @@ def dickeybub(obj):
     except:
         obj.log("Failed to acquire pricing data")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def farm_and_home(obj):
@@ -177,7 +204,10 @@ def farm_and_home(obj):
     except:
         obj.log("Failed to acquire pricing data")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     #obj.log("Competitor: %d not yet defined" %obj.comp_id)
     #obj.set_undefined()
     return
@@ -213,7 +243,10 @@ def home_depot(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def lowes(obj):
@@ -242,7 +275,10 @@ def lowes(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def menards(obj):
@@ -266,7 +302,10 @@ def menards(obj):
     except:
         obj.log("Failed to acquire pricing data")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def orscheln(obj):
@@ -285,7 +324,10 @@ def orscheln(obj):
     except:
         obj.log("Out of Stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def petsense(obj):
@@ -302,7 +344,10 @@ def petsense(obj):
     #No third party
     #No out of stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def ruralking(obj):
@@ -322,7 +367,10 @@ def ruralking(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def sears(obj):
@@ -336,7 +384,10 @@ def sears(obj):
     #No Third Party
     #No out of Stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def shelper(obj):
@@ -350,7 +401,10 @@ def shelper(obj):
         #No third party
         #No out of stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def tsc(obj):
@@ -374,7 +428,10 @@ def tsc(obj):
         #no third party
         #no out of stock
     finally:
-        obj.kill_driver()
+        try:
+            obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def valleyvet(obj):
@@ -420,7 +477,10 @@ def walmart(obj):
     except:
         obj.log("Out of stock check failed")
     finally:
+        try:
             obj.kill_driver()
+        except:
+            obj.log("Error Deleting Driver")
     return
 
 def _default(obj):

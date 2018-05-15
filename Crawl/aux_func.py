@@ -17,9 +17,9 @@ def clean(string):
     string = string.strip()
     string = string.replace("$","")
     string = string.split('-')
+    non_decimal = re.compile(r'[^\d.]+') # remove all alpha chars
+    string[0] = non_decimal.sub('', string[0])
     if '.' not in string[0]:
-        non_decimal = re.compile(r'[^\d.]+') # remove all alpha chars
-        string[0] = non_decimal.sub('', string[0])
         string = string[0][:-2] + '.' + string[0][-2:]
         return float(string)
     return float(string[0])

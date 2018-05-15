@@ -27,10 +27,11 @@ except:
 
 def daemon():
     while True:
-        if datetime.now().strftime("%H:%M") == '23:59':
+        if datetime.now().strftime("%H:%M") == '06:00':
             while True:
                 try:
                     file_move()
+                    sys.exit(0)
                     time.sleep(60)
                     break
                 except Exception as e:

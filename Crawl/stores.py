@@ -259,7 +259,7 @@ def lowes(obj):
     elif obj.comp_id == 24:
         loc_ins = "loc_data.lowes(self,62221,'Belleville')"
     price_selectors = {"input[name=productId]":"data-productprice","span.secondary-text.small-type.art-pd-wasPriceLbl":"innerHTML",\
-    "span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
+    "span[itemprop=price]":"content","span.primary-font.jumbo.strong.art-pd-price":"innerHTML"}
     sale_selectors = {"span.primary-font.jumbo.strong.art-pd-contractPricing":"innerHTML"}
     broken_link_selectors = {"div.alert.alert-warning i.icon-error-outline.red":"",\
     " div.pd-shipping-delivery.met-fulfillment-delivery.grid-50.tablet-grid-50 div.media-body > p":"innerHTML|||unavailable"}
@@ -420,7 +420,7 @@ def tsc(obj):
         loc_ins = "loc_data.tsc(self,'63801')"
     price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
     sale_selectors = {"span.dollar_price":"innerHTML"}
-    broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML"}
+    broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML","div#UnpubProductErrormsg":"innerHTML|||selection below"}
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors,loc_ins)
     except:
@@ -440,7 +440,7 @@ def valleyvet(obj):
     return
 
 def walmart(obj):
-    price_selectors = {"div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group" : "title",\
+    price_selectors = {"span.price-characteristic[itemprop=price]":"content","div.Price-old.display-inline-block.arrange-fill.font-normal.u-textNavyBlue.display-inline > span.Price-group" : "title",\
     "div.prod-BotRow.prod-showBottomBorder.prod-OfferSection.prod-OfferSection-twoPriceDisplay div.Grid-col:nth-child(4) span.Price-group" : "title",\
     "span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textNavyBlue > span.Price-group" : "title",\
     "span.display-inline-block.arrange-fit.Price.Price-enhanced.u-textGray > span.Price-group" : "title",}
@@ -453,23 +453,22 @@ def walmart(obj):
         obj.log("Failed to aquire pricing data")
     #check for Third party
     try:
-        if obj._find_data("span.seller-shipping-msg.font-semibold.u-textBlue"):
-                sellers = obj._driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
-                for sell in sellers:
-                    if sell.find_element_by_css_selector("span.seller-shipping-msg.font-semibold.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
-                        obj.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
-                        break
-                else:
-                    obj.set_third_party()
-        elif not obj._find_data("a.font-bold.prod-SoldShipByMsg[href='http://help.walmart.com']"):
+        if not obj._find_data("a[data-tl-id=ProductSellerInfo-SellerName]","innerHTML|||Walmart"):
+            sellers = obj._driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+            for sell in sellers:
+                if sell.find_element_by_css_selector("span.seller-shipping-msg.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
+                    obj.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
+                    break
+            else:
+                obj.set_third_party()
+        else:
             obj.set_third_party()
-
     except:
         obj.log("Third party check failed")
     #check Out of stock
     try:
         try:
-            oos = obj._driver.find_element_by_css_selector("span.copy-mini.display-block-xs.font-bold.u-textBlack").get_attribute("innerHTML")
+            oos = obj._driver.find_element_by_css_selector("div.prod-ProductOffer-oosMsg.prod-PaddingTop--xxs > span").get_attribute("innerHTML")
         except:
             oos = "in stock"
         if "Out of stock" in oos:

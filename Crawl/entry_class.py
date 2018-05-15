@@ -17,14 +17,18 @@ import shutil
 import os
 import stores
 import time
+import requests
 #from io import StringIO   #what is this line for?
 import sys
+
+
+test_mach = 0
+email_crash_report = 1
 sys.path.append( os.path.expanduser("~/Documents"))
 try:
     from crawlconfig import *
 except:
-    test_mach = 0
-    email_crash_report = 1
+    pass
 
 
 class Entry:
@@ -73,6 +77,10 @@ class Entry:
         return "**********\nSku: {}\nPrice: {}\nSale Price: {}\nThird Party: {}\nOut of Stock: {}\nComp_id: {}\nUrl: {}\n**********".format(\
         self.sku, self.comp_price, self.comp_sale_price, self.comp_shop_third_party, self.comp_shop_out_of_stock,self.comp_id, self.url)
 
+    def __del__(self):
+        if self._driver:
+            self._driver.quit()
+
     def write_entry(self, file):
         if (self.comp_price != None and self.comp_sale_price != None and self.comp_price != False and self.comp_price != '0.0'):
             self.log("Writing entry to file: " + file,True)
@@ -87,6 +95,10 @@ class Entry:
             self.log("Entry not valid. Writing to alternate file.")
             self.log("Closer inspection needed,Price: {},{}".format(self.comp_price,self.url),False,os.path.expanduser('~/Documents/unwritten_%s.csv' %self.ip))
         return
+
+    # def shout_into_the_wind(self,ip):
+    #     r = requests.post("http://10.0.10.246:5000",data = {'data':self._data_tup()})
+    #     print(r.text)
 
 
     def _data_tup(self):
@@ -153,8 +165,6 @@ class Entry:
             if self._driver:
                 self._driver.quit()
                 self.log("Driver destroyed",True)
-            else:
-                self.log("Error driver doesn't exist")
         except:
             pass
         finally:
@@ -308,6 +318,7 @@ class Entry:
             37 : stores.acehardware,
             43 : stores.bootbarn,
             44 : stores.shelper,
+            45 : stores.Chewy,
             73 : stores.tsc,
             74 : stores.tsc,
             123: stores.petsense,

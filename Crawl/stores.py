@@ -196,7 +196,7 @@ def farm_and_home(obj):
     elif obj.comp_id == 4:
         loc_ins = "loc_data.farm_and_home(self,2)"
 
-    price_selectors = {"div.product-main-info > div.price-box > span.regular-price > span.price" : "innerHTML"}
+    price_selectors = {"div.product-main-info > div.price-box > span.regular-price > span.price" : "innerHTML", "div.product-info-price span.price" : "innerHTML"}
     sale_selectors = {}
     broken_link_selectors = {}
     try:

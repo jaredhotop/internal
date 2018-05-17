@@ -351,7 +351,7 @@ def petsense(obj):
     return
 
 def ruralking(obj):
-    price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content",}
+    price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content","meta[property='product:price:amount']":"content",}
     #"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
     sale_selectors = {"":""}
     broken_link_selectors = {"div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}

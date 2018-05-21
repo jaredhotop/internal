@@ -351,10 +351,11 @@ def petsense(obj):
     return
 
 def ruralking(obj):
-    price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content",}
+    price_selectors = {"meta[itemprop=price]":"content","meta[property='product:price:amount']":"content","span.price" : "innerHTML"}
     #"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
     sale_selectors = {"":""}
-    broken_link_selectors = {"div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}
+    broken_link_selectors = {"div.bluefoot-row.bluefoot-structural.with-media-background.not-found-404-page span" : "innerHTML|||SORRY",\
+    "div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
     except:
@@ -454,15 +455,13 @@ def walmart(obj):
     #check for Third party
     try:
         if not obj._find_data("a[data-tl-id=ProductSellerInfo-SellerName]","innerHTML|||Walmart"):
-            sellers = obj._driver.find_elements_by_css_selector("div.secondary-bot div.arrange.seller-container")
+            sellers = obj._driver.find_elements_by_css_selector("div.marketplace-body")
             for sell in sellers:
                 if sell.find_element_by_css_selector("span.seller-shipping-msg.u-textBlue").get_attribute("innerHTML").encode('utf-8') == 'Walmart':
                     obj.set_price(aux_func.clean(sell.find_element_by_css_selector("span.Price-group").get_attribute('title')))
                     break
             else:
                 obj.set_third_party()
-        else:
-            obj.set_third_party()
     except:
         obj.log("Third party check failed")
     #check Out of stock

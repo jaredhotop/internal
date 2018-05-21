@@ -351,10 +351,11 @@ def petsense(obj):
     return
 
 def ruralking(obj):
-    price_selectors = {"span.price" : "innerHTML","meta[itemprop=price]":"content","meta[property='product:price:amount']":"content",}
+    price_selectors = {"meta[itemprop=price]":"content","meta[property='product:price:amount']":"content","span.price" : "innerHTML"}
     #"span[itemprop=offers] > span[itemprop=price]":"innerHTML"}
     sale_selectors = {"":""}
-    broken_link_selectors = {"div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}
+    broken_link_selectors = {"div.bluefoot-row.bluefoot-structural.with-media-background.not-found-404-page span" : "innerHTML|||SORRY",\
+    "div.page-head-alt >h2":"innerHTML|||Sorry","div.page-head-alt >h3":"innerHTML|||Sorry"}
     try:
         obj.pricing(price_selectors,sale_selectors,broken_link_selectors)
     except:

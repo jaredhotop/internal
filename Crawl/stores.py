@@ -230,16 +230,19 @@ def home_depot(obj):
         obj.log("Failed to acquire pricing data")
         #Out of stock check
     try:
+#Checking for hidden field that indicates availability
         try:
             if obj._find_data("input#availableInLocalStore","value|||false"):
                 obj.set_out_of_stock()
         except:
-            try:
-                WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
-                if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
-                    obj.set_out_of_stock()
-            except TimeoutException as error:
-                pass
+            pass
+#Check for if the quantity box under Pick Up In Store is zero
+        try:
+            WebDriverWait(obj._driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.buybelt__box")))
+            if '0' == str(obj._retrieve_data("span.quantity","innerHTML")):
+                obj.set_out_of_stock()
+        except TimeoutException as error:
+            pass
     except:
         obj.log("Out of stock check failed")
     finally:

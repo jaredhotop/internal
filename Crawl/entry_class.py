@@ -156,7 +156,7 @@ class Entry:
         firefox_options.add_argument("--headless")
         # chrome_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
-        self._driver = webdriver.Firefox(executable_path = os.path.expanduser('~/bin/geckodriver'),firefox_options = firefox_options)
+        self._driver = webdriver.Firefox(executable_path = os.path.expanduser('~/bin/geckodriver'),firefox_options = firefox_options,log_path = os.path.expanduser("~/Documents/geckodriver.log")  )
         self.log("Driver created",True)
         return self._driver
 

@@ -192,7 +192,7 @@ def dickeybub(obj):
 
 def farm_and_home(obj):
     if obj.comp_id == 25:
-        loc_ins = "locdata.farm_and_home(self,10)"
+        loc_ins = "loc_data.farm_and_home(self,10)"
     elif obj.comp_id == 4:
         loc_ins = "loc_data.farm_and_home(self,2)"
 

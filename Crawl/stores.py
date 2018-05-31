@@ -422,7 +422,7 @@ def tsc(obj):
         loc_ins = "loc_data.tsc(self,'63640')"
     elif obj.comp_id == 124:
         loc_ins = "loc_data.tsc(self,'63801')"
-    price_selectors = {"span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
+    price_selectors = {"div.was_save_sku span.was_text":"innerHTML","span.dollar_price":"innerHTML"}
     sale_selectors = {"span.dollar_price":"innerHTML"}
     broken_link_selectors = {"div#WC_GenericError_6.info":"innerHTML","div#UnpubProductErrormsg":"innerHTML|||selection below"}
     try:

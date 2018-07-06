@@ -125,8 +125,8 @@ Gui, Submit, nohide
 		}
 	}
 	
-	user:="schedule"
-	pass:="shrugs"
+	user:=""
+	pass:=""
 	
 	if (script_1=1)
 	{

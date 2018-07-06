@@ -63,7 +63,7 @@ def append_to_log(message,err=None,file = os.path.expanduser('~/Documents/run.lo
         if email:
             msg =Etext("{}\n Machine-{}\n\n{}".format(message,ip[3],err))
             msg['Subject'] = "Machine-{}".format(ip[3])
-            server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+            server.sendmail('','',msg.as_string())
     return
 
 def file_move():
@@ -111,10 +111,10 @@ def file_move():
         if email_crash_report:
             server = smtplib.SMTP('smtp.gmail.com',587)
             server.starttls()
-            server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+            server.login('','')
             msg =Etext("Failed to move files on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
             msg['Subject'] = "Failed File Movement"
-            server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+            server.sendmail('','',msg.as_string())
             server.quit()
     return
 
@@ -130,7 +130,7 @@ status_post("Started")
 
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()
-server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+server.login('','')
 
 try:
     with open(os.path.expanduser("~/Documents/run.log"),'a') as f:
@@ -164,10 +164,10 @@ except:
     if email_crash_report:
         server = smtplib.SMTP('smtp.gmail.com',587)
         server.starttls()
-        server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+        server.login('','')
         msg =Etext("Script Failed on Clone {}:\n{}".format(ip[3],traceback.format_exc()))
         msg['Subject'] = "Generic Script Failure"
-        server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+        server.sendmail('','',msg.as_string())
         server.quit()
     else:
         raise

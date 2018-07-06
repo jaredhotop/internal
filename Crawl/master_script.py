@@ -11,7 +11,7 @@ import shutil
 
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()
-server.login('buchheit.emailer@gmail.com','!@#$%^&*()')
+server.login('','')
 Q = Queue.Queue()
 
 def aggr_uwritten():
@@ -44,12 +44,12 @@ try:
 except:
     msg =Etext("Master failed to aggregate unwritten:\n{}".format(traceback.format_exc()))
     msg['Subject'] = "Master Failed to Aggregate Unwritten"
-    server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+    server.sendmail('','',msg.as_string())
 try:
     aggr_valid_records()
 except:
     msg =Etext("Master failed to aggregate valid records:\n{}".format(traceback.format_exc()))
     msg['Subject'] = "Master Failed to Aggreagate Valid Records"
-    server.sendmail('buchheit.emailer@gmail.com','jayson.scruggs.work@gmail.com',msg.as_string())
+    server.sendmail('','',msg.as_string())
 finally:
     server.quit()
